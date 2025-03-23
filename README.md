@@ -9,7 +9,9 @@ This backend server provides RESTful API endpoints for basic functionality such 
 ## Team Responsibilities
 
 - **Edmund** – Set up backend architecture, implemented HTTPS server, designed and coded user authentication logic with PostgreSQL, JWT-based login flow, and environment configuration
-
+- **James** - 
+- **Justin** - 
+- **Jacob** - 
 
 ## Features Implemented
 
@@ -23,7 +25,17 @@ This backend server provides RESTful API endpoints for basic functionality such 
 - In-memory user storage (for Milestone 3 functionality; to be replaced with PostgreSQL in future)
 - Error handling with `try/catch` and server-side logging for authentication routes
 - Connected to PostgreSQL database using `pg`
+- Started deployment to `Render`
 
 ## Login Documentation
 
-- Postgresql | Username: `postgres` Password: `Password`
+| Parameter       | Value              |
+|----------------|--------------------|
+| Username        | `postgres`         |
+| Password        | `password`         |
+| Database Name   | `exchange4students`|
+
+## Notes
+- Out of Network Connection
+  - NGROK - Ran into compatability issues, need to test again
+  - Render - Pushed successfully, however does not start Server and Database in the same port (Website launches however fails to communicate with Server/Database)

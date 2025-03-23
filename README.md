@@ -12,7 +12,7 @@ Exchange4Students enables students to:
 
 | Team Member      | Responsibilities |
 |------------------|------------------|
-| Edmund Yuen      | 
+| Edmund Yuen      | Backend architecture, HTTPS setup, user authentication (JWT), PostgreSQL integration |
 | Jacob Gelman     | 
 | James Grant      | 
 | Justin Phan      | 
@@ -22,3 +22,7 @@ Exchange4Students enables students to:
 ## Software Used
 
 - **Node.js** – Server-side framework
+- **Express.js** – Web server framework
+- **PostgreSQL** – Relational database
+- **pg** – PostgreSQL client for Node.js
+- **OpenSSL** – Local HTTPS certificate generation

@@ -16,3 +16,8 @@ This backend server provides RESTful API endpoints for basic functionality such 
 - Environment variable support using `dotenv`
 - CORS enabled for frontend integration
 - HTTPS with self-signed certificate for local testing
+- REST API endpoints for:
+  - `POST /auth/register` – User registration with password hashing
+  - `POST /auth/login` – User login with password verification and JWT issuance
+- In-memory user storage (for Milestone 3 functionality; to be replaced with PostgreSQL in future)
+- Error handling with `try/catch` and server-side logging for authentication routes

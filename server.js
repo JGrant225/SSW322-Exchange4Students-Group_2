@@ -24,3 +24,6 @@ const options = {
 https.createServer(options, app).listen(PORT, () => {
     console.log(`Secure server running on https://localhost:${PORT}`);
 });
+
+const authRoutes = require("./routes/auth");
+app.use("/auth", authRoutes);

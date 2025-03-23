@@ -23,3 +23,7 @@ This backend server provides RESTful API endpoints for basic functionality such 
 - In-memory user storage (for Milestone 3 functionality; to be replaced with PostgreSQL in future)
 - Error handling with `try/catch` and server-side logging for authentication routes
 - Connected to PostgreSQL database using `pg`
+
+## Login Documentation
+
+- Postgresql | Username: `postgres` Password: `Password`

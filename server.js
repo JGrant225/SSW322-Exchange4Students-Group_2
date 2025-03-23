@@ -27,3 +27,8 @@ https.createServer(options, app).listen(PORT, () => {
 
 const authRoutes = require("./routes/auth");
 app.use("/auth", authRoutes);
+
+app.use(cors({
+  origin: "http://localhost:3000",
+  credentials: true
+}));

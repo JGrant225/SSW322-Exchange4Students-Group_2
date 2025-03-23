@@ -2,7 +2,9 @@ const express = require("express");
 const router = express.Router();
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
-const pool = require("../db"); // <-- import db connection
+const pool = require("../db");
+
+console.log("POOL TYPE:", typeof pool.query);
 
 // Register
 router.post("/register", async (req, res) => {

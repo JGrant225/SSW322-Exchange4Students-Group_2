@@ -10,7 +10,7 @@ This backend server provides RESTful API endpoints for basic functionality such 
 
 - **Edmund** – Set up backend architecture, basic authentication routes, HTTPS support
 
-## Features Implemented (So Far)
+## Features Implemented
 
 - Basic Node.js + Express server setup
 - Environment variable support using `dotenv`

@@ -8,7 +8,7 @@ This backend server provides RESTful API endpoints for basic functionality such 
 
 ## Team Responsibilities
 
-- **Edmund** – Set up backend architecture, implemented HTTPS server, designed and coded user authentication logic with PostgreSQL, JWT-based login flow, and environment configuration
+- **Edmund** – Set up backend architecture, implemented HTTPS server, designed and coded user authentication logic with PostgreSQL, JWT-based login flow, and environment configuration, started troubleshooting Global Access
 - **James** - 
 - **Justin** - 
 - **Jacob** - 

@@ -8,7 +8,8 @@ This backend server provides RESTful API endpoints for basic functionality such 
 
 ## Team Responsibilities
 
-- **Edmund** – Set up backend architecture, basic authentication routes, HTTPS support
+- **Edmund** – Set up backend architecture, implemented HTTPS server, designed and coded user authentication logic with PostgreSQL, JWT-based login flow, and environment configuration
+
 
 ## Features Implemented
 
@@ -21,3 +22,4 @@ This backend server provides RESTful API endpoints for basic functionality such 
   - `POST /auth/login` – User login with password verification and JWT issuance
 - In-memory user storage (for Milestone 3 functionality; to be replaced with PostgreSQL in future)
 - Error handling with `try/catch` and server-side logging for authentication routes
+- Connected to PostgreSQL database using `pg`

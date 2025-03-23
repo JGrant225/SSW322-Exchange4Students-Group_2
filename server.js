@@ -1,34 +1,31 @@
 require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
-const fs = require("fs");
-const https = require("https");
+const path = require("path");
 
 const app = express();
-app.use(cors());
+
+// CORS: allow frontend to talk to backend (adjust if needed)
+app.use(cors({
+  origin: "*",
+  credentials: true,
+}));
+
 app.use(express.json());
 
-app.get("/", (req, res) => {
-    res.send("Exchange4Students API is running securely...");
-});
-
-const PORT = process.env.PORT || 5000;
-
-// Load SSL Certificate and Key
-const options = {
-    key: fs.readFileSync("server.key"),
-    cert: fs.readFileSync("server.cert"),
-};
-
-// Start HTTPS server
-app.listen(PORT, () => {
-    console.log(`Server running on http://0.0.0.0:${PORT}`);
-  });  
-
+// Routes
 const authRoutes = require("./routes/auth");
 app.use("/auth", authRoutes);
 
-app.use(cors({
-  origin: "http://localhost:3000",
-  credentials: true
-}));
+// Serve React frontend from /build
+app.use(express.static(path.join(__dirname, "build")));
+
+app.get("*", (req, res) => {
+  res.sendFile(path.join(__dirname, "build", "index.html"));
+});
+
+// Start server
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`Server running on http://0.0.0.0:${PORT}`);
+});

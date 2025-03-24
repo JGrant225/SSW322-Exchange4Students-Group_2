@@ -39,3 +39,6 @@ This backend server provides RESTful API endpoints for basic functionality such 
 - Out of Network Connection
   - NGROK - Ran into compatability issues, need to test again
   - Render - Pushed successfully, however does not start Server and Database in the same port (Website launches however fails to communicate with Server/Database)
+- Startup
+  - Server - Run `npm start` under `SSW 322`
+  - Frontend - Run `npm start -- --host 0.0.0.0` under `SSW 322/exchange4students-frontend`

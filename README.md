@@ -8,24 +8,27 @@ This backend server provides RESTful API endpoints for basic functionality such 
 
 ## Team Responsibilities
 
-- **Edmund** – Set up backend architecture, implemented HTTPS server, designed and coded user authentication logic with PostgreSQL, JWT-based login flow, and environment configuration, started troubleshooting Global Access
+- **Edmund** – Set up backend architecture, implemented HTTPS server, User registration logic with PostgreSQL, JWT-based login flow, and environment configuration, started troubleshooting Global Access, Post Item Functionality
 - **James** - 
 - **Justin** - 
 - **Jacob** - 
 
 ## Features Implemented
 
+### BACKEND
 - Basic Node.js + Express server setup
-- Environment variable support using `dotenv`
-- CORS enabled for frontend integration
-- HTTPS with self-signed certificate for local testing
 - REST API endpoints for:
   - `POST /auth/register` – User registration with password hashing
   - `POST /auth/login` – User login with password verification and JWT issuance
-- In-memory user storage (for Milestone 3 functionality; to be replaced with PostgreSQL in future)
 - Error handling with `try/catch` and server-side logging for authentication routes
 - Connected to PostgreSQL database using `pg`
 - Started deployment to `Render`
+- Identify sellers by JWT-authenticated username
+- Post items for sale (title, description, price)
+
+### FRONTEND
+- Login/Logout
+- Post item form
 
 ## Login Documentation (Postgresql)
 
@@ -41,4 +44,4 @@ This backend server provides RESTful API endpoints for basic functionality such 
   - Render - Pushed successfully, however does not start Server and Database in the same port (Website launches however fails to communicate with Server/Database)
 - Startup
   - Server - Run `npm start` under `SSW 322`
-  - Frontend - Run `npm start -- --host 0.0.0.0` under `SSW 322/exchange4students-frontend`
+  - Frontend - Run `npm start` under `SSW 322/exchange4students-frontend`, `npm start -- --host 0.0.0.0`

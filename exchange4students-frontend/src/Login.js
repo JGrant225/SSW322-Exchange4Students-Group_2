@@ -2,34 +2,35 @@ import React, { useState } from "react";
 import axios from "axios";
 
 // Login component handles user authentication form
-const Login = () => {
-  // State to store form input values (username & password)
+const Login = ({ onLoginSuccess }) => {
+  // State to store form input values
   const [form, setForm] = useState({ username: "", password: "" });
 
-  // State to display feedback message (success or error)
+  // State to show login result message
   const [message, setMessage] = useState("");
 
-  // Handle changes in input fields
+  // Handle form input updates
   const handleChange = (e) => {
-    // Dynamically update the form state based on input field name
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  // Handle form submission
+  // Handle form submit
   const handleSubmit = async (e) => {
-    e.preventDefault(); // Prevent page refresh on form submission
+    e.preventDefault();
 
     try {
-      // Send a POST request to the backend /auth/login route
+      // Send POST request to backend
       const res = await axios.post(`${process.env.REACT_APP_API_URL}/auth/login`, form);
 
-      // If login succeeds, show success message and store token
-      setMessage("Login successful");
+      // Notify App component of login
+      if (onLoginSuccess) {
+        onLoginSuccess(res.data.token);
+      }
 
-      // Store the JWT token in localStorage for future use (e.g., authentication)
-      localStorage.setItem("token", res.data.token);
+      // Set success message
+      setMessage("Login successful");
     } catch (err) {
-      // If login fails, show error message from server or fallback message
+      // Show error message
       setMessage(err.response?.data?.message || "Login failed");
     }
   };
@@ -37,29 +38,20 @@ const Login = () => {
   return (
     <div>
       <h2>Login</h2>
-
-      {/* Login form */}
       <form onSubmit={handleSubmit}>
-        {/* Username input */}
         <input
           name="username"
           placeholder="Username"
           onChange={handleChange}
         />
-
-        {/* Password input */}
         <input
           name="password"
           type="password"
           placeholder="Password"
           onChange={handleChange}
         />
-
-        {/* Submit button */}
         <button type="submit">Login</button>
       </form>
-
-      {/* Display message below the form */}
       <p>{message}</p>
     </div>
   );

@@ -37,6 +37,10 @@ app.listen(PORT, '0.0.0.0', () => {
   console.log(`Server running on http://0.0.0.0:${PORT}`);
 });
 
-//Routes test
+// Routes test
 console.log("JWT loaded:", process.env.JWT_SECRET?.slice(0, 10));
+
+// Route to pull items
+const itemRoutes = require("./routes/items");
+app.use("/items", itemRoutes);
 

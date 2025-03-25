@@ -27,10 +27,10 @@ This backend server provides RESTful API endpoints for basic functionality such 
 - Connected to PostgreSQL database using `pg`
 - Started deployment to `Render`
 
-## Login Documentation
+## Login Documentation (Postgresql)
 
 | Parameter       | Value              |
-|----------------|--------------------|
+|-----------------|--------------------|
 | Username        | `postgres`         |
 | Password        | `password`         |
 | Database Name   | `exchange4students`|

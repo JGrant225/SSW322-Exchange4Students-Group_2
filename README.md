@@ -44,13 +44,15 @@ This backend server provides RESTful API endpoints for basic functionality such 
   - NGROK - Ran into compatability issues, need to test again
   - Render - Pushed successfully, however does not start Server and Database in the same port (Website launches however fails to communicate with Server/Database)
 - Startup
-  - Server - Run `npm install` then `npm start` under `SSW 322`
+  - Server - - Install `Node`, then run `npm install` then `npm start` under `SSW 322`
   - Frontend - Run `npm install` then `npm start` under `SSW 322/exchange4students-frontend`, `npm start -- --host 0.0.0.0`
-  - Database - Install `PostgreSQL` then run
-    psql postgres
+  - Database - Install `PostgreSQL` then run `psql postgres`
+    
+    -- Create Database --
     CREATE DATABASE exchange4students;
     \c exchange4students
-    -- Users table --
+
+    -- Create Users Table --
     CREATE TABLE users (
       id SERIAL PRIMARY KEY,
       username TEXT UNIQUE NOT NULL,

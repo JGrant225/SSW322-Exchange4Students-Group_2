@@ -18,6 +18,10 @@ Exchange4Students enables students to:
 | Justin Phan      | 
 
 ## Functions Implemented
+- Users can log in to the system
+- A user can register an account for the first time
+- A seller can create a post to sell an item, which could be of any type, with the respective information of the item type collected
+- A buyer can browse previously posted items and select an item to view details
 
 ## Technologies Used
 

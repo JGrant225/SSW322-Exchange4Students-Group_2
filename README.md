@@ -24,7 +24,7 @@ This backend server provides RESTful API endpoints for basic functionality such 
 - Connected to PostgreSQL database using `pg`
 - Started deployment to `Render`
 - Identify sellers by JWT-authenticated username
-- Post items for sale (title, description, price)
+- Post items for sale (title, description, price, photo)
 
 ### FRONTEND
 - Login/Logout

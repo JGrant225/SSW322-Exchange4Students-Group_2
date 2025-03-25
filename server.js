@@ -36,3 +36,7 @@ const PORT = process.env.PORT || 5000;
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`Server running on http://0.0.0.0:${PORT}`);
 });
+
+//Routes test
+console.log("JWT loaded:", process.env.JWT_SECRET?.slice(0, 10));
+

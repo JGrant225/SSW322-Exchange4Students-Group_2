@@ -31,9 +31,12 @@ const handleSubmit = async (e) => {
 
     // If successful, display success message from server
     setMessage(res.data.message);
+
   } catch (err) {
+
     // If error, display error message from server or fallback text
     setMessage(err.response?.data?.message || "Registration failed");
+    
   }
 };
 

@@ -46,3 +46,25 @@ This backend server provides RESTful API endpoints for basic functionality such 
 - Startup
   - Server - Run `npm install` then `npm start` under `SSW 322`
   - Frontend - Run `npm install` then `npm start` under `SSW 322/exchange4students-frontend`, `npm start -- --host 0.0.0.0`
+  - Database - Install `PostgreSQL` then run
+    psql postgres
+    CREATE DATABASE exchange4students;
+    \c exchange4students
+    -- Users table
+    CREATE TABLE users (
+      id SERIAL PRIMARY KEY,
+      username TEXT UNIQUE NOT NULL,
+      password TEXT NOT NULL
+    );
+
+    -- Items table
+    CREATE TABLE items (
+      id SERIAL PRIMARY KEY,
+      title TEXT,
+      description TEXT,
+      price NUMERIC,
+      seller_username TEXT,
+      image TEXT,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    );
+

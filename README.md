@@ -50,14 +50,14 @@ This backend server provides RESTful API endpoints for basic functionality such 
     psql postgres
     CREATE DATABASE exchange4students;
     \c exchange4students
-    -- Users table
+    -- Users table --
     CREATE TABLE users (
       id SERIAL PRIMARY KEY,
       username TEXT UNIQUE NOT NULL,
       password TEXT NOT NULL
     );
 
-    -- Items table
+    -- Items table --
     CREATE TABLE items (
       id SERIAL PRIMARY KEY,
       title TEXT,

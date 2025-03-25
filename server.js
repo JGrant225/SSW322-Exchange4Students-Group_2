@@ -46,3 +46,11 @@ app.listen(PORT, '0.0.0.0', () => {
 
 // Debug log for JWT loaded from environment
 console.log("JWT loaded:", process.env.JWT_SECRET?.slice(0, 10));
+
+// Error handling
+app.use((err, req, res, next) => {
+  console.error("Unhandled error:", err.stack);
+  res.status(err.status || 500).json({
+    message: err.message || "Internal Server Error"
+  });
+});

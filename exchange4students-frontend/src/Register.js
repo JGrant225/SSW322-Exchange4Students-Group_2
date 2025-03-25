@@ -15,20 +15,27 @@ const Register = () => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  // Handle form submission
-  const handleSubmit = async (e) => {
-    e.preventDefault(); // Prevent page refresh on submit
-    try {
-      // Send POST request to backend /auth/register route
-      const res = await axios.post(`${process.env.REACT_APP_API_URL}/auth/register`, form);
+// Handle form submission
+const handleSubmit = async (e) => {
+  e.preventDefault(); // Prevent page refresh on submit
 
-      // If successful, display success message from server
-      setMessage(res.data.message);
-    } catch (err) {
-      // If error, display error message from server or fallback text
-      setMessage(err.response?.data?.message || "Registration failed");
-    }
-  };
+  // Client-side validation for empty fields
+  if (!form.username || !form.password) {
+    setMessage("Username and password cannot be empty");
+    return;
+  }
+
+  try {
+    // Send POST request to backend /auth/register route
+    const res = await axios.post(`${process.env.REACT_APP_API_URL}/auth/register`, form);
+
+    // If successful, display success message from server
+    setMessage(res.data.message);
+  } catch (err) {
+    // If error, display error message from server or fallback text
+    setMessage(err.response?.data?.message || "Registration failed");
+  }
+};
 
   return (
     <div>

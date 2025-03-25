@@ -1,10 +1,10 @@
 # Exchange4Students
 
-This is the Node.js backend server for **Exchange4Students**, a web application built for Stevens students to post, browse, and exchange items on campus.
+This is the Node.js backend server for **Exchange4Students**, a web application built for Stevens students to post, browse, and exchange items.
 
 ## Introduction
 
-This backend server provides RESTful API endpoints for basic functionality such as user registration, login, and (eventually) item listing and browsing.
+This backend server provides RESTful API endpoints for basic functionality such as user registration, login, and item listing and browsing.
 
 ## Team Responsibilities
 
@@ -27,6 +27,7 @@ This backend server provides RESTful API endpoints for basic functionality such 
 - Post items for sale (title, description, price, photo)
 
 ### FRONTEND
+- Register
 - Login/Logout
 - Post item form
 
@@ -43,5 +44,5 @@ This backend server provides RESTful API endpoints for basic functionality such 
   - NGROK - Ran into compatability issues, need to test again
   - Render - Pushed successfully, however does not start Server and Database in the same port (Website launches however fails to communicate with Server/Database)
 - Startup
-  - Server - Run `npm start` under `SSW 322`
-  - Frontend - Run `npm start` under `SSW 322/exchange4students-frontend`, `npm start -- --host 0.0.0.0`
+  - Server - Run `npm install` then `npm start` under `SSW 322`
+  - Frontend - Run `npm install` then `npm start` under `SSW 322/exchange4students-frontend`, `npm start -- --host 0.0.0.0`

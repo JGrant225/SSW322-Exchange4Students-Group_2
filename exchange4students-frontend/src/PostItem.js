@@ -10,6 +10,9 @@ const PostItem = ({ username, token }) => {
     price: ""
   });
 
+  // State to store selected image file
+  const [image, setImage] = useState(null);
+
   // State to display success or error message from server
   const [message, setMessage] = useState("");
 
@@ -19,12 +22,18 @@ const PostItem = ({ username, token }) => {
   // Clear form and message whenever token changes (user logs in or out)
   useEffect(() => {
     setForm({ title: "", description: "", price: "" });
+    setImage(null);
     setMessage("");
   }, [token]);
 
-  // Handle changes in form input fields
+  // Handle changes in form text input fields
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
+  };
+
+  // Handle file input change
+  const handleImageChange = (e) => {
+    setImage(e.target.files[0]);
   };
 
   // Handle form submission
@@ -38,13 +47,23 @@ const PostItem = ({ username, token }) => {
     }
 
     try {
-      // Send POST request to backend with Authorization header
+      // Use FormData to send text fields and image file
+      const formData = new FormData();
+      formData.append("title", form.title);
+      formData.append("description", form.description);
+      formData.append("price", form.price);
+      if (image) {
+        formData.append("image", image);
+      }
+
+      // Send POST request with Authorization header
       await axios.post(
         `${process.env.REACT_APP_API_URL}/items`,
-        form,
+        formData,
         {
           headers: {
-            Authorization: `Bearer ${token}`
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "multipart/form-data"
           }
         }
       );
@@ -52,6 +71,7 @@ const PostItem = ({ username, token }) => {
       // On success, show confirmation and reset form
       setMessage("Item posted successfully!");
       setForm({ title: "", description: "", price: "" });
+      setImage(null);
     } catch (err) {
       // On error, show error message from server or fallback
       console.error("Error posting item:", err);
@@ -67,7 +87,8 @@ const PostItem = ({ username, token }) => {
       {isLoggedIn ? (
         <>
           <p>Logged in as: <strong>{username}</strong></p>
-          <form onSubmit={handleSubmit}>
+          <form onSubmit={handleSubmit} encType="multipart/form-data">
+            {/* Item title */}
             <input
               name="title"
               placeholder="Item Title"
@@ -75,6 +96,7 @@ const PostItem = ({ username, token }) => {
               onChange={handleChange}
             /><br/>
 
+            {/* Description */}
             <textarea
               name="description"
               placeholder="Item Description"
@@ -82,12 +104,20 @@ const PostItem = ({ username, token }) => {
               onChange={handleChange}
             /><br/>
 
+            {/* Price */}
             <input
               name="price"
               type="number"
               placeholder="Price"
               value={form.price}
               onChange={handleChange}
+            /><br/>
+
+            {/* Image upload */}
+            <input
+              type="file"
+              accept="image/*"
+              onChange={handleImageChange}
             /><br/>
 
             <button type="submit">Post Item</button>

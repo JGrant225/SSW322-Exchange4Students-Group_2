@@ -19,9 +19,16 @@ app.use(cors({
 // Middleware to parse incoming JSON in request bodies
 app.use(express.json());
 
+// Serve uploaded images statically from /uploads
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+
 // Import and mount authentication routes
 const authRoutes = require("./routes/auth");
 app.use("/auth", authRoutes);
+
+// Import and mount item routes
+const itemRoutes = require("./routes/items");
+app.use("/items", itemRoutes);
 
 // Serve static files from the React frontend build folder
 app.use(express.static(path.join(__dirname, "build")));
@@ -37,10 +44,5 @@ app.listen(PORT, '0.0.0.0', () => {
   console.log(`Server running on http://0.0.0.0:${PORT}`);
 });
 
-// Routes test
+// Debug log for JWT loaded from environment
 console.log("JWT loaded:", process.env.JWT_SECRET?.slice(0, 10));
-
-// Route to pull items
-const itemRoutes = require("./routes/items");
-app.use("/items", itemRoutes);
-

@@ -1,4 +1,4 @@
-# Exchange4Students Backend
+# Exchange4Students
 
 This is the Node.js backend server for **Exchange4Students**, a web application built for Stevens students to post, browse, and exchange items on campus.
 

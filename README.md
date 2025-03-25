@@ -30,6 +30,7 @@ Exchange4Students enables students to:
 - **PostgreSQL** – Relational database
 - **pg** – PostgreSQL client for Node.js
 - **OpenSSL** – Local HTTPS certificate generation
+- **React.js** - Frontend library to develop UI
 
 ## Installation
 1. Open a terminal

@@ -46,6 +46,18 @@ const PostItem = ({ username, token }) => {
       return;
     }
 
+    // Basic field validation
+    if (!form.title || !form.description || !form.price) {
+      setMessage("All fields are required");
+      return;
+    }
+
+    // Price must be a number and greater than zero
+    if (isNaN(form.price) || parseFloat(form.price) <= 0) {
+      setMessage("Price must be a positive number");
+      return;
+    }
+
     try {
       // Use FormData to send text fields and image file
       const formData = new FormData();
@@ -114,12 +126,32 @@ const PostItem = ({ username, token }) => {
             /><br/>
 
             {/* Image upload */}
-            <input
-              type="file"
-              accept="image/*"
-              onChange={handleImageChange}
-            /><br/>
+            <label>
+              Upload Image:
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handleImageChange}
+                style={{ display: "block", marginTop: "0.5rem" }}
+              />
+            </label>
 
+            {/* Preview selected image filename and thumbnail */}
+            {image && (
+              <div style={{ marginTop: "0.5rem" }}>
+                <strong>Selected file:</strong> {image.name}
+                <div style={{ marginTop: "0.5rem" }}>
+                  <img
+                    src={URL.createObjectURL(image)}
+                    alt="Preview"
+                    style={{ maxWidth: "200px", border: "1px solid #ccc", marginTop: "0.5rem" }}
+                  />
+                </div>
+              </div>
+            )}
+
+            {/* Submit button */}
+            <br />
             <button type="submit">Post Item</button>
           </form>
         </>

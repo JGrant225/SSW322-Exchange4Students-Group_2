@@ -11,6 +11,7 @@ export function LoginPage() {
   const [username, setUsername] = useState("");
   const [token, setToken] = useState("");
   const [selectedTab, setSelectedTab] = useState("seller");
+  const [refreshTrigger, setRefreshTrigger] = useState(false);
 
   // Refresh flag to trigger item re-fetch after posting
   const [refreshItems, setRefreshItems] = useState(false);
@@ -61,7 +62,7 @@ export function LoginPage() {
       {selectedTab === "seller" && (
         <>
           <PostItem username={username} token={token} onItemPosted={handleItemPosted} />
-          <SellerItems username={username} token={token} refreshTrigger={refreshItems} />
+          <SellerItems username={username} token={token} refreshTrigger={refreshItems} onItemModified={handleItemPosted} />
         </>
       )}
 

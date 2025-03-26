@@ -1,4 +1,5 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 # SSW322-Milestone3-Group_2
 
 ## Project Description
@@ -41,6 +42,8 @@ Exchange4Students enables students to:
 5. Start the app using `npm start`
 6. Open a browser and search `http://localhost:3000`
 =======
+=======
+>>>>>>> e73b807ca097353a8d24e7e2bde95b6d327b0f4a
 # Exchange4Students
 
 This is the Node.js backend server for **Exchange4Students**, a web application built for Stevens students to post, browse, and exchange items.
@@ -113,4 +116,7 @@ This backend server provides RESTful API endpoints for basic functionality such 
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     );
 
+<<<<<<< HEAD
+>>>>>>> e73b807ca097353a8d24e7e2bde95b6d327b0f4a
+=======
 >>>>>>> e73b807ca097353a8d24e7e2bde95b6d327b0f4a

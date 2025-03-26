@@ -1,7 +1,7 @@
 import React, { useState } from "react";
-import Register from "./Register";
-import Login from "./Login";
-import PostItem from "./PostItem";
+import Register from "./Components/Register";
+import Login from "./Components/Login";
+import PostItem from "./Components/PostItem";
 import { jwtDecode } from "jwt-decode";
 
 function App() {

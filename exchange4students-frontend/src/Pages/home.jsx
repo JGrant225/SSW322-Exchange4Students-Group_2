@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import Register from "../Components/Register";
 import Login from "../Components/Login";
-import PostItem from "../Components/PostItem";
+// import PostItem from "../Components/PostItem";
 import { jwtDecode } from "jwt-decode";
 import { useNavigate } from "react-router-dom";
 
@@ -24,10 +24,15 @@ export default function Home(){
       const decoded = jwtDecode(newToken);
       setUsername(decoded.username);
       setToken(newToken);
+      navigate("/itemPosting", {
+        state: {
+          username: decoded.username,
+          token: newToken
+        }
+      });
     } catch {
       setUsername("");
       setToken("");
-      navigate("/itemPosting");
     }
   };
 
@@ -52,9 +57,6 @@ export default function Home(){
           <hr />
         </>
       )}
-
-      {/* Always show PostItem */}
-      <PostItem username={username} token={token} />
     </div>
   );
 }

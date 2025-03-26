@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
 // PostItem component handles the form for posting a new item
-const PostItem = ({ username, token }) => {
+const PostItem = ({ username, token, onItemPosted }) => {
   // State to store form input values
   const [form, setForm] = useState({
     title: "",
@@ -17,29 +17,29 @@ const PostItem = ({ username, token }) => {
   // State to display success or error message from server
   const [message, setMessage] = useState("");
 
-  // Determine login status based on presence of username and token
+  // Boolean to track login status based on props
   const isLoggedIn = !!(username && token);
 
   const navigate = useNavigate();
 
-  // Clear form and message whenever token changes (user logs in or out)
+  // Clear form state when token changes (login/logout)
   useEffect(() => {
     setForm({ title: "", description: "", price: "" });
     setImage(null);
     setMessage("");
   }, [token]);
 
-  // Handle changes in form text input fields
+  // Handle typing in input fields
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  // Handle file input change
+  // Handle file upload
   const handleImageChange = (e) => {
     setImage(e.target.files[0]);
   };
 
-  // Logout function clears state
+  // Handle logout - navigates back to homepage
   const handleLogout = () => {
     navigate("/", {
       state: {
@@ -47,32 +47,31 @@ const PostItem = ({ username, token }) => {
         token: ""
       }
     });
-  };  
+  };
 
   // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Prevent posting if no token
+    // Prevent post if no token
     if (!token) {
       setMessage("You must be logged in to post an item.");
       return;
     }
 
-    // Basic field validation
+    // Input validation
     if (!form.title || !form.description || !form.price) {
       setMessage("All fields are required");
       return;
     }
 
-    // Price must be a number and greater than zero
     if (isNaN(form.price) || parseFloat(form.price) <= 0) {
       setMessage("Price must be a positive number");
       return;
     }
 
     try {
-      // Use FormData to send text fields and image file
+      // Create FormData to include image
       const formData = new FormData();
       formData.append("title", form.title);
       formData.append("description", form.description);
@@ -81,7 +80,7 @@ const PostItem = ({ username, token }) => {
         formData.append("image", image);
       }
 
-      // Send POST request with Authorization header
+      // Send POST request to backend with token in header
       await axios.post(
         `${process.env.REACT_APP_API_URL}/items`,
         formData,
@@ -93,12 +92,17 @@ const PostItem = ({ username, token }) => {
         }
       );
 
-      // On success, show confirmation and reset form
+      // Reset form and show confirmation
       setMessage("Item posted successfully!");
       setForm({ title: "", description: "", price: "" });
       setImage(null);
+
+      // Trigger parent refresh (used in SellerItems)
+      if (onItemPosted) {
+        onItemPosted();
+      }
     } catch (err) {
-      // On error, show error message from server or fallback
+      // Display error message from backend or fallback
       console.error("Error posting item:", err);
       setMessage(err.response?.data?.message || "Failed to post item");
     }
@@ -106,39 +110,41 @@ const PostItem = ({ username, token }) => {
 
   return (
     <div>
-      {/* If user is logged in, show the form */}
+      {/* If user is logged in, show form */}
       {isLoggedIn ? (
         <>
           <p>Logged in as: <strong>{username}</strong></p>
           <button onClick={handleLogout}>Logout</button>
           <h2>Post an Item</h2>
+
+          {/* Form for submitting a new item */}
           <form onSubmit={handleSubmit} encType="multipart/form-data">
-            {/* Item title */}
+            {/* Title input */}
             <input
               name="title"
               placeholder="Item Title"
               value={form.title}
               onChange={handleChange}
-            /><br/>
+            /><br />
 
-            {/* Description */}
+            {/* Description input */}
             <textarea
               name="description"
               placeholder="Item Description"
               value={form.description}
               onChange={handleChange}
-            /><br/>
+            /><br />
 
-            {/* Price */}
+            {/* Price input */}
             <input
               name="price"
               type="number"
               placeholder="Price"
               value={form.price}
               onChange={handleChange}
-            /><br/>
+            /><br />
 
-            {/* Image upload */}
+            {/* File upload */}
             <label>
               Upload Image:
               <input
@@ -149,7 +155,7 @@ const PostItem = ({ username, token }) => {
               />
             </label>
 
-            {/* Preview selected image filename and thumbnail */}
+            {/* Thumbnail preview */}
             {image && (
               <div style={{ marginTop: "0.5rem" }}>
                 <strong>Selected file:</strong> {image.name}
@@ -157,25 +163,28 @@ const PostItem = ({ username, token }) => {
                   <img
                     src={URL.createObjectURL(image)}
                     alt="Preview"
-                    style={{ maxWidth: "200px", border: "1px solid #ccc", marginTop: "0.5rem" }}
+                    style={{
+                      maxWidth: "200px",
+                      border: "1px solid #ccc",
+                      marginTop: "0.5rem"
+                    }}
                   />
                 </div>
               </div>
             )}
 
-            {/* Submit button */}
             <br />
             <button type="submit">Post Item</button>
           </form>
         </>
       ) : (
-        // If not logged in, show warning message
+        // If user is not logged in
         <p style={{ color: "red" }}>
           You must be logged in to post items.
         </p>
       )}
 
-      {/* Display server response or feedback message */}
+      {/* Show server feedback message */}
       {message && <p>{message}</p>}
     </div>
   );

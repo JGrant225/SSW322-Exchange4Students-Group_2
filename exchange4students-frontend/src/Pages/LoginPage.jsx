@@ -1,89 +1,79 @@
 import React, { useState, useEffect } from "react";
-// import Register from "../Components/Register";
-// import Login from "../Components/Login";
-// import PostItem from "../Components/PostItem";
-import { jwtDecode } from "jwt-decode";
 import { useLocation, useNavigate } from "react-router-dom";
+import PostItem from "../Components/PostItem";
+import SellerItems from "../Pages/SellerItems";
 
-export function LoginPage(){
-    // Track logged-in user and token (in memory only)
-    const location = useLocation();
-    const [username, setUsername] = useState("");
-    const [token, setToken] = useState("");
-    const navigate = useNavigate();
+// LoginPage handles role selection and renders seller/buyer specific content
+export function LoginPage() {
+  const location = useLocation();
+  const navigate = useNavigate();
 
-    // Logout function clears state
-    const handleLogout = () => {
-        setUsername("");
-        setToken("");
-        navigate("/");
-    };
+  const [username, setUsername] = useState("");
+  const [token, setToken] = useState("");
+  const [selectedTab, setSelectedTab] = useState("seller");
 
-    // Navigate Seller function to change to Item Posting Page
-    const navSeller = () => {
-        try {
-            const decoded = jwtDecode(token);
-            setUsername(decoded.username);
-            navigate("/ItemPosting", {
-                state: {
-                    username: decoded.username,
-                    token: token
-                }
-            });
-        } catch {
-            setUsername("");
-        }
+  // Refresh flag to trigger item re-fetch after posting
+  const [refreshItems, setRefreshItems] = useState(false);
+
+  // Clears state and returns to home
+  const handleLogout = () => {
+    setUsername("");
+    setToken("");
+    navigate("/");
+  };
+
+  // Initialize from passed state
+  useEffect(() => {
+    const state = location.state;
+    if (state && state.username && state.token) {
+      setUsername(state.username);
+      setToken(state.token);
+    } else {
+      navigate("/");
     }
+  }, [location, navigate]);
 
-    
-    // Navigate Buyer function to change to Item Posting Page
-    const navBuyer = () => {
-        try {
-            const decoded = jwtDecode(token);
-            setUsername(decoded.username);
-            navigate("/Test", {
-                state: {
-                    username: decoded.username,
-                    token: token
-                }
-            });
-        } catch {
-            setUsername("");
-        }
-    }
+  // Handler for new item posted
+  const handleItemPosted = () => {
+    setRefreshItems((prev) => !prev); // toggles value to trigger re-fetch
+  };
 
+  return (
+    <div style={{ padding: "2rem" }}>
+      <h1>Exchange4Students</h1>
 
-     useEffect(() => {
-         // Check if state was passed during navigation
-         const state = location.state;
-         if (state && state.username && state.token) {
-           setUsername(state.username);
-           setToken(state.token);
-         } else {
-           // If no state, redirect to login
-           navigate("/");
-         }
-       }, [location, navigate]);
-    
-    
-    return (
-        <div style={{ padding: "2rem" }}>
-        <h1>Exchange4Students</h1>
+      {username && (
+        <>
+          <p>Logged in as: <strong>{username}</strong></p>
+          <button onClick={handleLogout}>Logout</button>
+        </>
+      )}
 
-        {/* If logged in, show logout info */}
-        {username && (
-            <div>
-            <p>Logged in as: <strong>{username}</strong></p>
-            <button onClick={handleLogout}>Logout</button>
-            </div>
-        )}
-        <h2>Choose a role: </h2>
-        <button onClick={navSeller}>Seller</button>
-        <button onClick={navBuyer}>Buyer</button>
+      <h2>Choose a role:</h2>
+      <div>
+        <button onClick={() => setSelectedTab("seller")}>Seller</button>
+        <button onClick={() => setSelectedTab("buyer")}>Buyer</button>
+      </div>
 
+      <hr />
 
+      {/* Seller View: Post item and view/edit/delete list */}
+      {selectedTab === "seller" && (
+        <>
+          <PostItem username={username} token={token} onItemPosted={handleItemPosted} />
+          <SellerItems username={username} token={token} refreshTrigger={refreshItems} />
+        </>
+      )}
+
+      {/* Buyer View (Placeholder) */}
+      {selectedTab === "buyer" && (
+        <div>
+          <h3>Buyer Page (Placeholder)</h3>
+          <p>This will later include browsing and cart functionality.</p>
         </div>
-    )
+      )}
+    </div>
+  );
 }
 
 export default LoginPage;

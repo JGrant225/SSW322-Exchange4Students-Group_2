@@ -22,6 +22,7 @@ Exchange4Students enables students to:
 - A user can register an account for the first time
 - A seller can create a post to sell an item, which could be of any type, with the respective information of the item type collected
 - A buyer can browse previously posted items and select an item to view details
+- A seller can edit or delete any of their posted items
 
 ## Technologies Used
 
@@ -31,6 +32,7 @@ Exchange4Students enables students to:
 - **pg** – PostgreSQL client for Node.js
 - **OpenSSL** – Local HTTPS certificate generation
 - **React.js** - Frontend library to develop UI
+- **Multer** - Middleware for Node to handle form data (File Upload)
 
 ## Installation
 1. Open a terminal
@@ -50,7 +52,7 @@ This backend server provides RESTful API endpoints for basic functionality such 
 
 ## Team Responsibilities
 
-- **Edmund** – Set up backend architecture, implemented HTTPS server, User registration logic with PostgreSQL, JWT-based login flow, and environment configuration, started troubleshooting Global Access, Post Item Functionality
+- **Edmund** – Set up backend architecture, implemented HTTPS server, User registration logic with PostgreSQL, JWT-based login flow, and environment configuration, started troubleshooting Global Access, Post Item Functionality, Edit/Delete Item Functionality
 - **James** - 
 - **Justin** - 
 - **Jacob** - 
@@ -66,7 +68,8 @@ This backend server provides RESTful API endpoints for basic functionality such 
 - Connected to PostgreSQL database using `pg`
 - Started deployment to `Render`
 - Identify sellers by JWT-authenticated username
-- Post items for sale (title, description, price, photo)
+- Post items for sale (title, description, price, photo) via Multer
+- Edit items (Includes editing image, and deleting)
 
 ### FRONTEND
 - Register

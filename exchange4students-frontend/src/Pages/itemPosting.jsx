@@ -55,7 +55,7 @@ export function ItemPosting(){
                 <button onClick={handleLogout}>Logout</button>
                 </div>
             )}
-                  Show Register and Login only when not logged in
+                  {/* Show Register and Login only when not logged in */}
             {!username && (
                 <>
                 <hr />

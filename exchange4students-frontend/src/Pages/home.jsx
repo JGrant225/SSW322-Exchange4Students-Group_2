@@ -8,13 +8,11 @@ import { useNavigate } from "react-router-dom";
 export default function Home(){
   // Track logged-in user and token (in memory only)
   const [username, setUsername] = useState("");
-  const [token, setToken] = useState("");
   const navigate = useNavigate();
 
   // Logout function clears state
   const handleLogout = () => {
     setUsername("");
-    setToken("");
     navigate("/");
   };
 
@@ -23,7 +21,6 @@ export default function Home(){
     try {
       const decoded = jwtDecode(newToken);
       setUsername(decoded.username);
-      setToken(newToken);
       navigate("/itemPosting", {
         state: {
           username: decoded.username,
@@ -32,7 +29,6 @@ export default function Home(){
       });
     } catch {
       setUsername("");
-      setToken("");
     }
   };
 

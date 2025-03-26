@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
 // PostItem component handles the form for posting a new item
@@ -19,6 +20,8 @@ const PostItem = ({ username, token }) => {
   // Determine login status based on presence of username and token
   const isLoggedIn = !!(username && token);
 
+  const navigate = useNavigate();
+
   // Clear form and message whenever token changes (user logs in or out)
   useEffect(() => {
     setForm({ title: "", description: "", price: "" });
@@ -35,6 +38,16 @@ const PostItem = ({ username, token }) => {
   const handleImageChange = (e) => {
     setImage(e.target.files[0]);
   };
+
+  // Logout function clears state
+  const handleLogout = () => {
+    navigate("/", {
+      state: {
+        username: "",
+        token: ""
+      }
+    });
+  };  
 
   // Handle form submission
   const handleSubmit = async (e) => {
@@ -93,12 +106,12 @@ const PostItem = ({ username, token }) => {
 
   return (
     <div>
-      <h2>Post an Item</h2>
-
       {/* If user is logged in, show the form */}
       {isLoggedIn ? (
         <>
           <p>Logged in as: <strong>{username}</strong></p>
+          <button onClick={handleLogout}>Logout</button>
+          <h2>Post an Item</h2>
           <form onSubmit={handleSubmit} encType="multipart/form-data">
             {/* Item title */}
             <input

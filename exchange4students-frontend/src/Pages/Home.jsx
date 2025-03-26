@@ -21,7 +21,7 @@ export default function Home(){
     try {
       const decoded = jwtDecode(newToken);
       setUsername(decoded.username);
-      navigate("/itemPosting", {
+      navigate("/LoginPage", {
         state: {
           username: decoded.username,
           token: newToken

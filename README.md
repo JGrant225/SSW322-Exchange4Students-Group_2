@@ -4,15 +4,16 @@
 
 Exchange4Students enables students to:
 - Register an account and securely log in
-- List items they want to sell
+- List items they want to sell and edit/delete listings
 - Browse items posted by other students
-- View item details and add items to a cart
-- Message sellers and arrange pickup or delivery
-- Proceed through a checkout flow for virtual transactions
+- View item details
+- Add items to cart (TO BE IMPLEMENTED)
+- Message sellers and arrange pickup or delivery (TO BE IMPLEMENTED)
+- Proceed through a checkout flow for virtual transactions (TO BE IMPLEMENTED)
 
 | Team Member      | Responsibilities |
 |------------------|------------------|
-| Edmund Yuen      | Backend architecture, HTTPS setup, user authentication (JWT), PostgreSQL integration |
+| Edmund Yuen      | Backend architecture, Seller backend setup, HTTPS setup, user authentication (JWT), PostgreSQL integration |
 | Jacob Gelman     | 
 | James Grant      | 
 | Justin Phan      | 

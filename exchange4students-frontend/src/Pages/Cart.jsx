@@ -29,7 +29,7 @@ export default function Cart({ username, token, refreshTrigger }) {
     };
 
     fetchCart();
-  }, [username, token, refreshTrigger]); // refreshTrigger enables live updates
+  }, [username, token, refreshTrigger]);
 
   // Remove item from cart by ID
   const handleRemove = async (itemId) => {

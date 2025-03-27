@@ -108,12 +108,11 @@ This backend server provides RESTful API endpoints for basic functionality such 
     -- Items table --
     CREATE TABLE items (
       id SERIAL PRIMARY KEY,
-      title TEXT,
+      title VARCHAR(255) NOT NULL,
       description TEXT,
-      price NUMERIC,
-      seller_username TEXT,
+      price NUMERIC(10,2) NOT NULL,
+      seller_username VARCHAR(255),
       image TEXT,
       category TEXT,
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     );
-

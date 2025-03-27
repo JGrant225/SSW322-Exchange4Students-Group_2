@@ -112,6 +112,7 @@ This backend server provides RESTful API endpoints for basic functionality such 
       price NUMERIC,
       seller_username TEXT,
       image TEXT,
+      category TEXT,
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     );
 

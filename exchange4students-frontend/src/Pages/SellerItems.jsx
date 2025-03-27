@@ -6,31 +6,31 @@ export default function SellerItems({ username, token, refreshTrigger }) {
   // State to hold all items posted by this seller
   const [items, setItems] = useState([]);
 
-  // State to handle inline editing
+  // State to track which item is being edited
   const [editingItemId, setEditingItemId] = useState(null);
 
-  // State to manage form inputs for the item being edited
+  // State for edit form inputs
   const [editForm, setEditForm] = useState({
     title: "",
     description: "",
     price: "",
-    image: null
+    image: null,
+    category: ""
   });
 
-  // Fetch seller's items when username/token/refresh changes
+  // Fetch seller's items whenever dependencies change
   useEffect(() => {
     const fetchItems = async () => {
       if (!username || !token) return;
 
       try {
-
         const res = await axios.get(`${process.env.REACT_APP_API_URL}/items`, {
           headers: {
             Authorization: `Bearer ${token}`
           }
         });
 
-        // Filter to only show current user's items
+        // Filter items by seller
         const sellerItems = res.data.filter(
           (item) => item.seller_username === username
         );
@@ -44,7 +44,7 @@ export default function SellerItems({ username, token, refreshTrigger }) {
     fetchItems();
   }, [username, token, refreshTrigger]);
 
-  // Delete an item by ID
+  // Delete an item
   const handleDelete = async (id) => {
     try {
       await axios.delete(`${process.env.REACT_APP_API_URL}/items/${id}`, {
@@ -52,34 +52,36 @@ export default function SellerItems({ username, token, refreshTrigger }) {
           Authorization: `Bearer ${token}`
         }
       });
+
       setItems((prevItems) => prevItems.filter((item) => item.id !== id));
     } catch (err) {
       console.error("Error deleting item:", err);
     }
   };
 
-  // Prepare form fields for editing an item
+  // Set up edit form for selected item
   const handleEditClick = (item) => {
     setEditingItemId(item.id);
     setEditForm({
       title: item.title,
       description: item.description,
       price: item.price,
-      image: null
+      image: null,
+      category: "" // Default to blank; if unchanged, keep original
     });
   };
 
-  // Track form field edits (text fields)
+  // Update form text fields
   const handleEditChange = (e) => {
     setEditForm({ ...editForm, [e.target.name]: e.target.value });
   };
 
-  // Track image file change
+  // Update selected image file
   const handleImageChange = (e) => {
     setEditForm({ ...editForm, image: e.target.files[0] });
   };
 
-  // Submit item update to backend
+  // Submit updated item to backend
   const handleEditSubmit = async (e) => {
     e.preventDefault();
 
@@ -90,6 +92,9 @@ export default function SellerItems({ username, token, refreshTrigger }) {
       formData.append("price", editForm.price);
       if (editForm.image) {
         formData.append("image", editForm.image);
+      }
+      if (editForm.category) {
+        formData.append("category", editForm.category);
       }
 
       await axios.put(
@@ -103,14 +108,13 @@ export default function SellerItems({ username, token, refreshTrigger }) {
         }
       );
 
-      // Refresh UI with updated values
+      // Re-fetch items to refresh UI
       const res = await axios.get(`${process.env.REACT_APP_API_URL}/items`, {
         headers: {
           Authorization: `Bearer ${token}`
         }
       });
-      
-      // Filter to only current user's items
+
       const sellerItems = res.data.filter(
         (item) => item.seller_username === username
       );
@@ -126,10 +130,8 @@ export default function SellerItems({ username, token, refreshTrigger }) {
     <div>
       <h2>Your Posted Items</h2>
 
-      {/* Show message if no items exist */}
       {items.length === 0 && <p>You have not posted any items yet.</p>}
 
-      {/* Loop through seller's items */}
       {items.map((item) => (
         <div
           key={item.id}
@@ -140,7 +142,7 @@ export default function SellerItems({ username, token, refreshTrigger }) {
           }}
         >
           {editingItemId === item.id ? (
-            // Edit mode: display form with current item details
+            // Editing form
             <form onSubmit={handleEditSubmit} encType="multipart/form-data">
               <input
                 name="title"
@@ -158,12 +160,32 @@ export default function SellerItems({ username, token, refreshTrigger }) {
                 value={editForm.price}
                 onChange={handleEditChange}
               /><br />
+
+              {/* Category selection dropdown */}
+              <label>
+                Category:
+                <select
+                  name="category"
+                  value={editForm.category}
+                  onChange={handleEditChange}
+                >
+                  <option value="">(No Change)</option>
+                  <option value="Sports">Sports</option>
+                  <option value="Music">Music</option>
+                  <option value="Technology">Technology</option>
+                  <option value="Clothes">Clothes</option>
+                  <option value="Misc">Misc</option>
+                </select>
+              </label>
+              <br />
+
               <input
                 type="file"
                 accept="image/*"
                 onChange={handleImageChange}
               /><br />
-              {/* Show preview if new image selected */}
+
+              {/* Image preview if a new image is selected */}
               {editForm.image && (
                 <div style={{ marginTop: "0.5rem" }}>
                   <strong>New image:</strong>
@@ -176,14 +198,17 @@ export default function SellerItems({ username, token, refreshTrigger }) {
               )}
               <br />
               <button type="submit">Save</button>
-              <button type="button" onClick={() => setEditingItemId(null)}>Cancel</button>
+              <button type="button" onClick={() => setEditingItemId(null)}>
+                Cancel
+              </button>
             </form>
           ) : (
-            // View mode: display item details
+            // Read-only view
             <>
               <h3>{item.title}</h3>
               <p>{item.description}</p>
               <p>Price: ${item.price}</p>
+              <p>Category: {item.category || "N/A"}</p>
               {item.image && (
                 <img
                   src={`${process.env.REACT_APP_API_URL}/uploads/${item.image}`}

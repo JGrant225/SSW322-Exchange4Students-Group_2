@@ -42,7 +42,7 @@ Exchange4Students enables students to:
 4. Install dependencies using `npm install` 
 5. Start the app using `npm start`
 6. Open a browser and search `http://localhost:3000`
-=======
+
 # Exchange4Students
 
 This is the Node.js backend server for **Exchange4Students**, a web application built for Stevens students to post, browse, and exchange items.

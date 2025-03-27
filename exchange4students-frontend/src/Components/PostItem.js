@@ -113,8 +113,8 @@ const PostItem = ({ username, token, onItemPosted }) => {
       {/* If user is logged in, show form */}
       {isLoggedIn ? (
         <>
-          <p>Logged in as: <strong>{username}</strong></p>
-          <button onClick={handleLogout}>Logout</button>
+          {/* <p>Logged in as: <strong>{username}</strong></p>
+          <button onClick={handleLogout}>Logout</button> */}
           <h2>Post an Item</h2>
 
           {/* Form for submitting a new item */}

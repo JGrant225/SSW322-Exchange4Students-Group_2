@@ -5,7 +5,7 @@ import SellerItems from "./SellerItems";
 import BrowseItems from "./BrowseItems";
 
 // LoginPage handles role selection and renders seller/buyer specific content
-export function LoginPage() {
+export function LoginPage({ onCartUpdate, onRoleChange }) {
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -53,21 +53,27 @@ export function LoginPage() {
 
       <h2>Choose a role:</h2>
       <div>
-        <button onClick={() => setSelectedTab("seller")}>Seller</button>
-        <button onClick={() => setSelectedTab("buyer")}>Buyer</button>
+        <button onClick={() => { setSelectedTab("seller"); onRoleChange("seller"); }}>Seller</button>
+        <button onClick={() => { setSelectedTab("buyer"); onRoleChange("buyer"); }}>Buyer</button>
       </div>
 
       <hr />
 
+      {/* Seller view */}
       {selectedTab === "seller" && (
         <>
           <PostItem username={username} token={token} onItemPosted={handleItemPosted} />
-          <SellerItems username={username} token={token} refreshTrigger={refreshItems} onItemModified={handleItemPosted} />
+          <SellerItems username={username} token={token} refreshTrigger={refreshItems} />
         </>
       )}
 
+      {/* Buyer view */}
       {selectedTab === "buyer" && (
-        <BrowseItems onCartUpdate={onCartUpdate} />
+        <BrowseItems
+          onCartUpdate={onCartUpdate}
+          username={username}
+          token={token}
+        />
       )}
     </div>
   );

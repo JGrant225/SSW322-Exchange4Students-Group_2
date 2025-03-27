@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import axios from "axios";
 
 export function Test(){
@@ -46,7 +46,7 @@ export function Test(){
         <div className="items">
           {loading && <p>Loading...</p>}
           {error && <p>{error}</p>}
-          
+
           {!loading && !error && items.length === 0 && selectedCategory && (
           <p>No items found for {selectedCategory}.</p>
         )}

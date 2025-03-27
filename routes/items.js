@@ -15,16 +15,16 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage });
 
-// Add new item with optional image
+// Add new item with optional image and category
 router.post("/", verifyToken, upload.single("image"), async (req, res) => {
-  const { title, description, price } = req.body;
+  const { title, description, price, category } = req.body;
   const seller_username = req.user.username;
   const image = req.file ? req.file.filename : null;
 
   try {
     const result = await pool.query(
-      "INSERT INTO items (title, description, price, seller_username, image) VALUES ($1, $2, $3, $4, $5) RETURNING *",
-      [title, description, price, seller_username, image]
+      "INSERT INTO items (title, description, price, seller_username, image, category) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *",
+      [title, description, price, seller_username, image, category]
     );
     res.status(201).json(result.rows[0]);
   } catch (err) {
@@ -81,16 +81,14 @@ router.delete("/:id", verifyToken, async (req, res) => {
   }
 });
 
-// Update an item posted by the logged-in seller
-// Route to update an item by ID (including optional new image)
+// Update an item posted by the logged-in seller (including optional new image or category)
 router.put("/:id", verifyToken, upload.single("image"), async (req, res) => {
   const itemId = req.params.id;
   const seller_username = req.user.username;
-  const { title, description, price } = req.body;
+  const { title, description, price, category } = req.body;
   const image = req.file ? req.file.filename : null;
 
   try {
-
     const existingItem = await pool.query(
       "SELECT * FROM items WHERE id = $1 AND seller_username = $2",
       [itemId, seller_username]
@@ -115,6 +113,10 @@ router.put("/:id", verifyToken, upload.single("image"), async (req, res) => {
     if (price) {
       fields.push(`price = $${index++}`);
       values.push(price);
+    }
+    if (category) {
+      fields.push(`category = $${index++}`);
+      values.push(category);
     }
     if (image) {
       fields.push(`image = $${index++}`);
@@ -143,22 +145,5 @@ router.put("/:id", verifyToken, upload.single("image"), async (req, res) => {
     res.status(500).json({ message: "Failed to update item" });
   }
 });
-
-router.get("/category/:category", async (req, res) => {
-  const { category } = req.params;
-
-  try {
-    const result = await pool.query(
-      "SELECT * FROM items WHERE category = $1 ORDER BY created_at DESC",
-      [category]
-    );
-
-    res.json(result.rows);
-  } catch (err) {
-    console.error("Error fetching items by category:", err);
-    res.status(500).json({ message: "Server error" });
-  }
-});
-
 
 module.exports = router;

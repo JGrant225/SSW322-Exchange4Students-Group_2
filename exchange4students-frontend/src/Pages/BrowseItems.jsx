@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import axios from "axios";
 
-// Test component is used for the Buyer side to view items by category
-export function Test() {
+// Buyer side to view items by category
+export function BrowseItems() {
   // Selected category state
   const [selectedCategory, setSelectedCategory] = useState(null);
 
@@ -102,4 +102,4 @@ export function Test() {
   );
 }
 
-export default Test;
+export default BrowseItems;

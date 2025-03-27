@@ -1,32 +1,25 @@
 import React, { useState } from "react";
 import axios from "axios";
 
-// Buyer side to view items by category
-export function BrowseItems() {
-  // Selected category state
+// BrowseItems component allows buyers to browse items by category and add them to the cart
+export function BrowseItems({ onCartUpdate }) {
   const [selectedCategory, setSelectedCategory] = useState(null);
-
-  // Array of items fetched from the server
   const [items, setItems] = useState([]);
-
-  // Loading and error states for request handling
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  // Function to fetch items by category from backend
+  // Token from localStorage
+  const token = localStorage.getItem("token");
+
+  // Fetch items for selected category
   const fetchItems = async (category) => {
     setLoading(true);
     setError(null);
     setItems([]);
 
     try {
-      // Fetch items for the selected category from backend
       const response = await axios.get(`${process.env.REACT_APP_API_URL}/items`);
-
-      // Filter by category on frontend (unless backend does it)
       const filtered = response.data.filter(item => item.category === category);
-
-      // Update state with filtered results
       setItems(filtered);
     } catch (err) {
       console.error("Error fetching items:", err);
@@ -36,12 +29,44 @@ export function BrowseItems() {
     }
   };
 
+  // Add item to cart (sends itemId only)
+  const handleAddToCart = async (itemId) => {
+    if (!token) {
+      alert("You must be logged in to add items to cart.");
+      return;
+    }
+  
+    try {
+      const payload = { itemId };
+      console.log("Sending to /cart/add:", payload);
+  
+      const res = await axios.post(
+        `${process.env.REACT_APP_API_URL}/cart/add`,
+        payload,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+  
+      console.log("Server response:", res.data);
+      alert("Item added to cart!");
+      if (onCartUpdate) onCartUpdate();
+    } catch (err) {
+      console.error("Error adding to cart:", err.response?.data || err);
+      alert("Failed to add item to cart.");
+    }
+  };
+  
+
   return (
     <div style={{ padding: "2rem" }}>
       <h1>Welcome to Exchange4Students Marketplace</h1>
       <h2>Select a category to browse</h2>
 
-      {/* Category filter buttons */}
+      {/* Category buttons */}
       <div style={{ marginBottom: "1rem" }}>
         {["Sports", "Music", "Technology", "Clothes", "Misc"].map((category) => (
           <button
@@ -61,17 +86,15 @@ export function BrowseItems() {
         ))}
       </div>
 
-      {/* Display loading, error, or fetched items */}
+      {/* Display loading, errors, or items */}
       <div className="items">
         {loading && <p>Loading items...</p>}
         {error && <p style={{ color: "red" }}>{error}</p>}
-
-        {/* If no items found */}
         {!loading && !error && selectedCategory && items.length === 0 && (
           <p>No items found for <strong>{selectedCategory}</strong>.</p>
         )}
 
-        {/* If items found */}
+        {/* Item cards */}
         {items.map((item) => (
           <div
             key={item.id}
@@ -87,7 +110,6 @@ export function BrowseItems() {
             <p><strong>Price:</strong> ${item.price}</p>
             <p><strong>Seller:</strong> {item.seller_username}</p>
 
-            {/* Show item image if available */}
             {item.image && (
               <img
                 src={`${process.env.REACT_APP_API_URL}/uploads/${item.image}`}
@@ -95,6 +117,13 @@ export function BrowseItems() {
                 style={{ width: "150px", height: "auto", marginTop: "0.5rem" }}
               />
             )}
+
+            <button
+              style={{ marginTop: "0.5rem" }}
+              onClick={() => handleAddToCart(item.id)}
+            >
+              Add to Cart
+            </button>
           </div>
         ))}
       </div>

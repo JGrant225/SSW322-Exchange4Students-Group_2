@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import PostItem from "../Components/PostItem";
 import SellerItems from "../Pages/SellerItems";
-import { Test }from "../Pages/Test";
+import BrowseItems from "../Pages/BrowseItems";
 
 // LoginPage handles role selection and renders seller/buyer specific content
 export function LoginPage() {
@@ -70,7 +70,7 @@ export function LoginPage() {
       {selectedTab === "buyer" && (
         <div>
           <h3>Buyer Page (Placeholder)</h3>
-          <Test />
+          <BrowseItems />
         </div>
       )}
 

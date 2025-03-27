@@ -14,7 +14,7 @@ Exchange4Students enables students to:
 |------------------|------------------|
 | Edmund Yuen      | Backend architecture, HTTPS setup, user authentication (JWT), PostgreSQL integration |
 | Jacob Gelman     | 
-| James Grant      | 
+| James Grant      | Frontend setup, .jsx Page Routing, Buyer Page Integration & Database connection 
 | Justin Phan      | 
 
 ## Functions Implemented

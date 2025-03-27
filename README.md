@@ -4,15 +4,16 @@
 
 Exchange4Students enables students to:
 - Register an account and securely log in
-- List items they want to sell
+- List items they want to sell and edit/delete listings
 - Browse items posted by other students
-- View item details and add items to a cart
-- Message sellers and arrange pickup or delivery
-- Proceed through a checkout flow for virtual transactions
+- View item details
+- Add items to cart (TO BE IMPLEMENTED)
+- Message sellers and arrange pickup or delivery (TO BE IMPLEMENTED)
+- Proceed through a checkout flow for virtual transactions (TO BE IMPLEMENTED)
 
 | Team Member      | Responsibilities |
 |------------------|------------------|
-| Edmund Yuen      | Backend architecture, HTTPS setup, user authentication (JWT), PostgreSQL integration |
+| Edmund Yuen      | Backend architecture, Seller backend setup, HTTPS setup, user authentication (JWT), PostgreSQL integration |
 | Jacob Gelman     | 
 | James Grant      | 
 | Justin Phan      | 
@@ -41,7 +42,7 @@ Exchange4Students enables students to:
 4. Install dependencies using `npm install` 
 5. Start the app using `npm start`
 6. Open a browser and search `http://localhost:3000`
-=======
+
 # Exchange4Students
 
 This is the Node.js backend server for **Exchange4Students**, a web application built for Stevens students to post, browse, and exchange items.
@@ -107,11 +108,11 @@ This backend server provides RESTful API endpoints for basic functionality such 
     -- Items table --
     CREATE TABLE items (
       id SERIAL PRIMARY KEY,
-      title TEXT,
+      title VARCHAR(255) NOT NULL,
       description TEXT,
-      price NUMERIC,
-      seller_username TEXT,
+      price NUMERIC(10,2) NOT NULL,
+      seller_username VARCHAR(255),
       image TEXT,
+      category TEXT,
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     );
-

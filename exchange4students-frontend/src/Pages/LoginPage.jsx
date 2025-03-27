@@ -62,7 +62,7 @@ export function LoginPage() {
       {selectedTab === "seller" && (
         <>
           <PostItem username={username} token={token} onItemPosted={handleItemPosted} />
-          <SellerItems username={username} token={token} refreshTrigger={refreshItems} />
+          <SellerItems username={username} token={token} refreshTrigger={refreshItems} onItemModified={handleItemPosted} />
         </>
       )}
 

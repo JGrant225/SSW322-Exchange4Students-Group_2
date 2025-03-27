@@ -4,6 +4,7 @@ import Home from './Pages/Home';
 import { LoginPage } from './Pages/LoginPage';
 import BrowseItems from './Pages/BrowseItems';
 import Cart from './Pages/Cart';
+import CheckoutPage from './Pages/CheckoutPage';
 import React, { useState } from 'react';
 
 function App() {
@@ -11,7 +12,7 @@ function App() {
   const [username] = useState(localStorage.getItem("username") || "");
 
   // Track buyer/seller role
-  const [userRole, setUserRole] = useState(""); // 'buyer' or 'seller'
+  const [userRole, setUserRole] = useState("");
 
   // Trigger to refresh cart
   const [cartUpdateTrigger, setCartUpdateTrigger] = useState(0);
@@ -45,6 +46,16 @@ function App() {
         <Route
           path="/BrowseItems"
           element={<BrowseItems onCartUpdate={handleCartUpdate} />}
+        />
+        <Route
+          path="/checkout"
+          element={
+            <CheckoutPage
+              token={token}
+              username={username}
+              onCartUpdate={handleCartUpdate}
+            />
+          }
         />
       </Routes>
     </Router>

@@ -126,3 +126,20 @@ This backend server provides RESTful API endpoints for basic functionality such 
       added_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
       UNIQUE (buyer_username, item_id)
     );
+    
+    -- Create Orders Table --
+    CREATE TABLE orders (
+      id SERIAL PRIMARY KEY,
+      buyer_username TEXT NOT NULL,
+      total NUMERIC(10,2),
+      placed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    );
+
+    -- Create Order Items Table --
+    CREATE TABLE order_items (
+      id SERIAL PRIMARY KEY,
+      order_id INTEGER REFERENCES orders(id) ON DELETE CASCADE,
+      item_id INTEGER REFERENCES items(id),
+      quantity INTEGER,
+      price NUMERIC(10,2)
+    );

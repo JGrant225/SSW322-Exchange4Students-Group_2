@@ -2,14 +2,11 @@ import React, { useState } from "react";
 import axios from "axios";
 
 // BrowseItems component allows buyers to browse items by category and add them to the cart
-export function BrowseItems({ onCartUpdate }) {
+export function BrowseItems({ onCartUpdate, username, token }) {
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-
-  // Token from localStorage
-  const token = localStorage.getItem("token");
 
   // Fetch items for selected category
   const fetchItems = async (category) => {
@@ -19,7 +16,7 @@ export function BrowseItems({ onCartUpdate }) {
 
     try {
       const response = await axios.get(`${process.env.REACT_APP_API_URL}/items`);
-      const filtered = response.data.filter(item => item.category === category);
+      const filtered = response.data.filter((item) => item.category === category);
       setItems(filtered);
     } catch (err) {
       console.error("Error fetching items:", err);
@@ -31,15 +28,15 @@ export function BrowseItems({ onCartUpdate }) {
 
   // Add item to cart (sends itemId only)
   const handleAddToCart = async (itemId) => {
-    if (!token) {
+    if (!token || !username) {
       alert("You must be logged in to add items to cart.");
       return;
     }
-  
+
     try {
       const payload = { itemId };
-      console.log("Sending to /cart/add:", payload);
-  
+      console.log("[AddToCart] POST /cart/add payload:", payload);
+
       const res = await axios.post(
         `${process.env.REACT_APP_API_URL}/cart/add`,
         payload,
@@ -50,16 +47,16 @@ export function BrowseItems({ onCartUpdate }) {
           },
         }
       );
-  
-      console.log("Server response:", res.data);
+
+      console.log("Cart add response:", res.data);
       alert("Item added to cart!");
+
       if (onCartUpdate) onCartUpdate();
     } catch (err) {
       console.error("Error adding to cart:", err.response?.data || err);
       alert("Failed to add item to cart.");
     }
   };
-  
 
   return (
     <div style={{ padding: "2rem" }}>
@@ -78,7 +75,7 @@ export function BrowseItems({ onCartUpdate }) {
             style={{
               marginRight: "0.5rem",
               padding: "0.5rem 1rem",
-              backgroundColor: selectedCategory === category ? "#ccc" : "#eee"
+              backgroundColor: selectedCategory === category ? "#ccc" : "#eee",
             }}
           >
             {category}
@@ -94,7 +91,6 @@ export function BrowseItems({ onCartUpdate }) {
           <p>No items found for <strong>{selectedCategory}</strong>.</p>
         )}
 
-        {/* Item cards */}
         {items.map((item) => (
           <div
             key={item.id}
@@ -102,7 +98,7 @@ export function BrowseItems({ onCartUpdate }) {
               border: "1px solid gray",
               padding: "1rem",
               marginBottom: "1rem",
-              maxWidth: "500px"
+              maxWidth: "500px",
             }}
           >
             <h3>{item.title}</h3>

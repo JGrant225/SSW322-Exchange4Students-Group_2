@@ -3,7 +3,7 @@ const router = express.Router();
 const pool = require("../db");
 const verifyToken = require("../middleware/auth");
 
-// Add item to cart
+// Add item to cart (prevent duplicates)
 router.post("/add", verifyToken, async (req, res) => {
   const buyer_username = req.user.username;
   const { itemId } = req.body;
@@ -15,11 +15,23 @@ router.post("/add", verifyToken, async (req, res) => {
   }
 
   try {
+    // Check if item is already in the cart
+    const existing = await pool.query(
+      `SELECT * FROM cart_items WHERE buyer_username = $1 AND item_id = $2`,
+      [buyer_username, itemId]
+    );
+
+    if (existing.rows.length > 0) {
+      return res.status(400).json({ message: "Item already in cart" });
+    }
+
+    // Insert if not already in cart
     await pool.query(
       `INSERT INTO cart_items (buyer_username, item_id)
        VALUES ($1, $2)`,
       [buyer_username, itemId]
     );
+
     res.status(201).json({ message: "Item added to cart" });
   } catch (err) {
     console.error("Error adding to cart:", err);

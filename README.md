@@ -116,3 +116,13 @@ This backend server provides RESTful API endpoints for basic functionality such 
       category TEXT,
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     );
+
+    -- Cart Items --
+    CREATE TABLE cart_items (
+      id SERIAL PRIMARY KEY,
+      buyer_username TEXT NOT NULL,
+      item_id INTEGER REFERENCES items(id) ON DELETE CASCADE,
+      quantity INTEGER DEFAULT 1,
+      added_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      UNIQUE (buyer_username, item_id)
+    );

@@ -7,25 +7,45 @@ import Cart from './Pages/Cart';
 import React, { useState } from 'react';
 
 function App() {
-  const token = localStorage.getItem("token");
-  const username = localStorage.getItem("username");
+  const [token] = useState(localStorage.getItem("token") || "");
+  const [username] = useState(localStorage.getItem("username") || "");
 
-  // State to trigger cart refresh
+  // Track buyer/seller role
+  const [userRole, setUserRole] = useState(""); // 'buyer' or 'seller'
+
+  // Trigger to refresh cart
   const [cartUpdateTrigger, setCartUpdateTrigger] = useState(0);
 
   const handleCartUpdate = () => {
-    setCartUpdateTrigger(prev => prev + 1);
+    setCartUpdateTrigger((prev) => prev + 1);
   };
 
   return (
     <Router>
-      {/* Floating Cart on all pages */}
-      <Cart username={username} token={token} refreshTrigger={cartUpdateTrigger} />
+      {/* Only show Cart if role is 'buyer' */}
+      {userRole === "buyer" && (
+        <Cart
+          username={username}
+          token={token}
+          refreshTrigger={cartUpdateTrigger}
+        />
+      )}
 
       <Routes>
         <Route path="/" element={<Home />} />
-        <Route path="/LoginPage" element={<LoginPage onCartUpdate={handleCartUpdate} />} />
-        <Route path="/BrowseItems" element={<BrowseItems onCartUpdate={handleCartUpdate} />} />
+        <Route
+          path="/LoginPage"
+          element={
+            <LoginPage
+              onCartUpdate={handleCartUpdate}
+              onRoleChange={(role) => setUserRole(role)}
+            />
+          }
+        />
+        <Route
+          path="/BrowseItems"
+          element={<BrowseItems onCartUpdate={handleCartUpdate} />}
+        />
       </Routes>
     </Router>
   );

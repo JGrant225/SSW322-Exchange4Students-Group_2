@@ -15,7 +15,7 @@ Exchange4Students enables students to:
 |------------------|------------------|
 | Edmund Yuen      | Backend architecture, Seller backend setup, HTTPS setup, user authentication (JWT), PostgreSQL integration |
 | Jacob Gelman     | 
-| James Grant      | 
+| James Grant      | Frontend setup, .jsx Page Routing, Buyer Page Integration & Database connection 
 | Justin Phan      | 
 
 ## Functions Implemented
@@ -54,7 +54,7 @@ This backend server provides RESTful API endpoints for basic functionality such 
 ## Team Responsibilities
 
 - **Edmund** – Set up backend architecture, implemented HTTPS server, User registration logic with PostgreSQL, JWT-based login flow, and environment configuration, started troubleshooting Global Access, Post Item Functionality, Edit/Delete Item Functionality
-- **James** - 
+- **James** - Set up frontend web display with seperate pages, components, and assets integrated through Routing, Integrated the initial Buyer page and connected item display through PostgreSQL database
 - **Justin** - 
 - **Jacob** - 
 

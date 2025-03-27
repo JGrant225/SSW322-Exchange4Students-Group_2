@@ -4,11 +4,12 @@ import axios from "axios";
 
 // PostItem component handles the form for posting a new item
 const PostItem = ({ username, token, onItemPosted }) => {
-  // State to store form input values
+  // State to store form input values including new category field
   const [form, setForm] = useState({
     title: "",
     description: "",
-    price: ""
+    price: "",
+    category: ""
   });
 
   // State to store selected image file
@@ -24,7 +25,7 @@ const PostItem = ({ username, token, onItemPosted }) => {
 
   // Clear form state when token changes (login/logout)
   useEffect(() => {
-    setForm({ title: "", description: "", price: "" });
+    setForm({ title: "", description: "", price: "", category: "" });
     setImage(null);
     setMessage("");
   }, [token]);
@@ -60,8 +61,8 @@ const PostItem = ({ username, token, onItemPosted }) => {
     }
 
     // Input validation
-    if (!form.title || !form.description || !form.price) {
-      setMessage("All fields are required");
+    if (!form.title || !form.description || !form.price || !form.category) {
+      setMessage("All fields including category are required");
       return;
     }
 
@@ -76,6 +77,7 @@ const PostItem = ({ username, token, onItemPosted }) => {
       formData.append("title", form.title);
       formData.append("description", form.description);
       formData.append("price", form.price);
+      formData.append("category", form.category);
       if (image) {
         formData.append("image", image);
       }
@@ -94,7 +96,7 @@ const PostItem = ({ username, token, onItemPosted }) => {
 
       // Reset form and show confirmation
       setMessage("Item posted successfully!");
-      setForm({ title: "", description: "", price: "" });
+      setForm({ title: "", description: "", price: "", category: "" });
       setImage(null);
 
       // Trigger parent refresh (used in SellerItems)
@@ -144,6 +146,20 @@ const PostItem = ({ username, token, onItemPosted }) => {
               onChange={handleChange}
             /><br />
 
+            {/* Category dropdown */}
+            <select
+              name="category"
+              value={form.category}
+              onChange={handleChange}
+            >
+              <option value="">Select Category</option>
+              <option value="Sports">Sports</option>
+              <option value="Music">Music</option>
+              <option value="Technology">Technology</option>
+              <option value="Clothes">Clothes</option>
+              <option value="Misc">Misc</option>
+            </select><br />
+
             {/* File upload */}
             <label>
               Upload Image:
@@ -191,3 +207,4 @@ const PostItem = ({ username, token, onItemPosted }) => {
 };
 
 export default PostItem;
+

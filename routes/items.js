@@ -144,6 +144,21 @@ router.put("/:id", verifyToken, upload.single("image"), async (req, res) => {
   }
 });
 
+router.get("/category/:category", async (req, res) => {
+  const { category } = req.params;
+
+  try {
+    const result = await pool.query(
+      "SELECT * FROM items WHERE category = $1 ORDER BY created_at DESC",
+      [category]
+    );
+
+    res.json(result.rows);
+  } catch (err) {
+    console.error("Error fetching items by category:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+});
 
 
 module.exports = router;

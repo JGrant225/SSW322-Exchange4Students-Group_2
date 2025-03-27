@@ -54,3 +54,5 @@ app.use((err, req, res, next) => {
     message: err.message || "Internal Server Error"
   });
 });
+
+app.use("/items", require("./routes/items"));

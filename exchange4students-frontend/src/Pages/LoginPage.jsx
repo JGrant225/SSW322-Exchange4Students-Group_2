@@ -1,43 +1,43 @@
 import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import PostItem from "../Components/PostItem";
-import SellerItems from "../Pages/SellerItems";
-import BrowseItems from "../Pages/BrowseItems";
+import SellerItems from "./SellerItems";
+import BrowseItems from "./BrowseItems";
 
 // LoginPage handles role selection and renders seller/buyer specific content
-export function LoginPage() {
+export function LoginPage({ onCartUpdate, onRoleChange }) {
   const location = useLocation();
   const navigate = useNavigate();
 
   const [username, setUsername] = useState("");
   const [token, setToken] = useState("");
   const [selectedTab, setSelectedTab] = useState("seller");
-  const [refreshTrigger, setRefreshTrigger] = useState(false);
-
-  // Refresh flag to trigger item re-fetch after posting
   const [refreshItems, setRefreshItems] = useState(false);
 
-  // Clears state and returns to home
+  // On logout, clear state and storage
   const handleLogout = () => {
     setUsername("");
     setToken("");
+    localStorage.removeItem("token");
+    localStorage.removeItem("username");
     navigate("/");
   };
 
-  // Initialize from passed state
+  // Initialize from passed state or redirect
   useEffect(() => {
     const state = location.state;
     if (state && state.username && state.token) {
       setUsername(state.username);
       setToken(state.token);
+      localStorage.setItem("username", state.username);
+      localStorage.setItem("token", state.token);
     } else {
       navigate("/");
     }
   }, [location, navigate]);
 
-  // Handler for new item posted
   const handleItemPosted = () => {
-    setRefreshItems((prev) => !prev); // toggles value to trigger re-fetch
+    setRefreshItems((prev) => !prev);
   };
 
   return (
@@ -53,30 +53,29 @@ export function LoginPage() {
 
       <h2>Choose a role:</h2>
       <div>
-        <button onClick={() => setSelectedTab("seller")}>Seller</button>
-        <button onClick={() => setSelectedTab("buyer")}>Buyer</button>
+        <button onClick={() => { setSelectedTab("seller"); onRoleChange("seller"); }}>Seller</button>
+        <button onClick={() => { setSelectedTab("buyer"); onRoleChange("buyer"); }}>Buyer</button>
       </div>
 
       <hr />
 
-      {/* Seller View: Post item and view/edit/delete list */}
+      {/* Seller view */}
       {selectedTab === "seller" && (
         <>
           <PostItem username={username} token={token} onItemPosted={handleItemPosted} />
-          <SellerItems username={username} token={token} refreshTrigger={refreshItems} onItemModified={handleItemPosted} />
+          <SellerItems username={username} token={token} refreshTrigger={refreshItems} />
         </>
       )}
 
-      {/* Buyer View (Placeholder) */}
+      {/* Buyer view */}
       {selectedTab === "buyer" && (
-        <div>
-          <h3>Buyer Page (Placeholder)</h3>
-          <BrowseItems />
-        </div>
+        <BrowseItems
+          onCartUpdate={onCartUpdate}
+          username={username}
+          token={token}
+        />
       )}
-
-      </div>
-    
+    </div>
   );
 }
 

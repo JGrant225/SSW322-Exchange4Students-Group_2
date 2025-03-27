@@ -1,15 +1,17 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import { useNavigate, useLocation } from "react-router-dom";
 
 // Cart component - floating button with dropdown cart display
 export default function Cart({ username, token, refreshTrigger }) {
-  // State for items, total price, dropdown visibility, and user messages
   const [cartItems, setCartItems] = useState([]);
   const [total, setTotal] = useState(0);
   const [message, setMessage] = useState("");
   const [isOpen, setIsOpen] = useState(false);
+  const navigate = useNavigate();
+  const location = useLocation();
 
-  // Fetch cart items from backend when token/username/refreshTrigger changes
+  // Fetch cart items (always run this hook!)
   useEffect(() => {
     const fetchCart = async () => {
       if (!username || !token) return;
@@ -31,7 +33,7 @@ export default function Cart({ username, token, refreshTrigger }) {
     fetchCart();
   }, [username, token, refreshTrigger]);
 
-  // Remove item from cart by ID
+  // Remove item from cart
   const handleRemove = async (itemId) => {
     try {
       await axios.delete(`${process.env.REACT_APP_API_URL}/cart/${itemId}`, {
@@ -48,21 +50,16 @@ export default function Cart({ username, token, refreshTrigger }) {
     }
   };
 
-  // Handle checkout
-  const handleCheckout = async () => {
-    try {
-      await axios.post(`${process.env.REACT_APP_API_URL}/cart/checkout`, {}, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-
-      setCartItems([]);
-      setTotal(0);
-      setMessage("Checkout successful!");
-    } catch (err) {
-      console.error("Checkout error:", err);
-      setMessage("Checkout failed.");
-    }
+  // Redirect to checkout
+  const handleCheckoutRedirect = () => {
+    setIsOpen(false);
+    navigate("/checkout");
   };
+
+  // ✅ Only return null AFTER hooks are called
+  if (location.pathname === "/checkout") {
+    return null;
+  }
 
   return (
     <div>
@@ -84,7 +81,7 @@ export default function Cart({ username, token, refreshTrigger }) {
         🛒 Cart ({cartItems.length})
       </div>
 
-      {/* Dropdown cart */}
+      {/* Cart dropdown */}
       {isOpen && (
         <div
           style={{
@@ -117,7 +114,7 @@ export default function Cart({ username, token, refreshTrigger }) {
               ))}
               <hr />
               <p><strong>Total:</strong> ${total.toFixed(2)}</p>
-              <button onClick={handleCheckout}>Checkout</button>
+              <button onClick={handleCheckoutRedirect}>Checkout</button>
             </>
           )}
         </div>

@@ -76,20 +76,58 @@ router.delete("/:itemId", verifyToken, async (req, res) => {
   }
 });
 
-// Checkout - clear all items for user
+// Checkout - create order and move items from cart to order_items
 router.post("/checkout", verifyToken, async (req, res) => {
-  const buyer_username = req.user.username;
-
-  try {
-    await pool.query(
-      `DELETE FROM cart_items WHERE buyer_username = $1`,
-      [buyer_username]
-    );
-    res.json({ message: "Checkout successful. Cart cleared." });
-  } catch (err) {
-    console.error("Checkout error:", err);
-    res.status(500).json({ message: "Checkout failed" });
-  }
-});
+    const buyer_username = req.user.username;
+  
+    try {
+      // Get all cart items for the user with prices
+      const cartResult = await pool.query(
+        `SELECT i.id AS item_id, i.price
+         FROM cart_items c
+         JOIN items i ON c.item_id = i.id
+         WHERE c.buyer_username = $1`,
+        [buyer_username]
+      );
+  
+      const cartItems = cartResult.rows;
+  
+      if (cartItems.length === 0) {
+        return res.status(400).json({ message: "Cart is empty" });
+      }
+  
+      // alculate total
+      const total = cartItems.reduce((sum, item) => sum + parseFloat(item.price), 0);
+  
+      // Insert new order
+      const orderRes = await pool.query(
+        `INSERT INTO orders (buyer_username, total)
+         VALUES ($1, $2) RETURNING id`,
+        [buyer_username, total]
+      );
+      const orderId = orderRes.rows[0].id;
+  
+      // Insert each item into order_items
+      for (const item of cartItems) {
+        await pool.query(
+          `INSERT INTO order_items (order_id, item_id, quantity, price)
+           VALUES ($1, $2, $3, $4)`,
+          [orderId, item.item_id, 1, item.price]
+        );
+      }
+  
+      // Clear the cart
+      await pool.query(
+        `DELETE FROM cart_items WHERE buyer_username = $1`,
+        [buyer_username]
+      );
+  
+      res.json({ message: "Checkout successful. Order created.", orderId });
+    } catch (err) {
+      console.error("Checkout error:", err);
+      res.status(500).json({ message: "Checkout failed" });
+    }
+  });
+  
 
 module.exports = router;

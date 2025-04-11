@@ -35,39 +35,61 @@ router.post("/", verifyToken, upload.single("image"), async (req, res) => {
 
 // Fetch all items
 router.get("/", async (req, res) => {
+  console.log("Query parameters received:", req.query);
   const { category, search } = req.query;
 
-  let query = "SELECT * FROM items";
-  const where = [];
-  const values = [];
-  let index = 1;
-
-  if (category) {
-    where.push(`category = $${index++}`);
-    values.push(category);
-  }
-
-  if (search) {
-    where.push(`(LOWER(title) LIKE $${index} OR LOWER(description) LIKE $${index})`);
-    values.push(`%${search.toLowerCase()}%`);
-    index++;
-  }
-
-  if (where.length > 0) {
-    query += " WHERE " + where.join(" AND ");
-  }
-
-  query += " ORDER BY created_at DESC";
-  
   try {
-    console.log("Executing query: ", query);
-    console.log("With values:", values);
+    // Start with a basic query
+    let queryText = "SELECT * FROM items";
+    const queryParams = [];
+    const conditions = [];
     
-    const result = await pool.query(query, values);
+    // Add category filter if provided
+    if (category) {
+      conditions.push(`category = $${queryParams.length + 1}`);
+      queryParams.push(category);
+    }
+    
+    // Add search terms if provided
+    if (search && search.trim()) {
+      const searchTerms = search.split(',').map(term => term.trim()).filter(Boolean);
+      console.log("Parsed search terms:", searchTerms);
+      
+      if (searchTerms.length > 0) {
+        // Create a combined search condition with OR operators
+        const searchConditions = [];
+
+        
+        searchTerms.forEach(term => {
+          const paramIndex = queryParams.length + 1;
+          searchConditions.push(`(LOWER(title) LIKE $${paramIndex} OR LOWER(description) LIKE $${paramIndex})`);
+          queryParams.push(`%${term.toLowerCase()}%`);
+        });
+        
+        // Add the combined search condition
+        conditions.push(`(${searchConditions.join(' OR ')})`);
+      }
+    }
+    
+    // Add WHERE clause if we have conditions
+    if (conditions.length > 0) {
+      queryText += " WHERE " + conditions.join(" AND ");
+    }
+    
+    // Add ordering
+    queryText += " ORDER BY created_at DESC";
+    
+    console.log("Final SQL query:", queryText);
+    console.log("Query parameters:", queryParams);
+    
+    // Execute the query
+    const result = await pool.query(queryText, queryParams);
+    console.log(`Query returned ${result.rows.length} items`);
+    
     res.json(result.rows);
   } catch (err) {
-    console.error("Error fetching items:", err);
-    res.status(500).json({ message: "Failed to fetch items" });
+    console.error("Error in GET /items:", err);
+    res.status(500).json({ message: "Error fetching items", error: err.message });
   }
 });
 

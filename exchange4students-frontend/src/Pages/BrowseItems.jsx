@@ -8,6 +8,7 @@ export function BrowseItems({ onCartUpdate, username, token }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
+  const [debugInfo, setDebugInfo] = useState('');
 
   // Initial load of items
   useEffect(() => {
@@ -18,25 +19,42 @@ export function BrowseItems({ onCartUpdate, username, token }) {
   const fetchItems = async (category = selectedCategory, search = searchTerm) => {
     setLoading(true);
     setError(null);
-    setItems([]);
+    setDebugInfo('');
 
     try {
+      // Build query parameters
       const params = new URLSearchParams();
       if (category) params.append("category", category);
-      if (search) params.append("search", search);
-  
-      const response = await axios.get(`${process.env.REACT_APP_API_URL}/items?${params.toString()}`);
+      if (search && search.trim()) params.append("search", search.trim());
+      
+      const apiUrl = `${process.env.REACT_APP_API_URL}/items`;
+      const fullUrl = `${apiUrl}${params.toString() ? `?${params.toString()}` : ''}`;
+      
+      console.log(`[BrowseItems] Making API request to: ${fullUrl}`);
+      setDebugInfo(prev => prev + `Making request to: ${fullUrl}\n`);
+      
+      const response = await axios.get(fullUrl);
+      
+      console.log(`[BrowseItems] API response status: ${response.status}`);
+      console.log(`[BrowseItems] Items returned: ${response.data.length}`);
+      setDebugInfo(prev => prev + `Response status: ${response.status}\nItems returned: ${response.data.length}\n`);
+      
       setItems(response.data);
     } catch (err) {
-      console.error("Error fetching items:", err);
-      setError("Error fetching items. Please try again.");
+      const errorMessage = err.response ? 
+        `Error ${err.response.status}: ${err.response.data.message || err.message}` :
+        `Error: ${err.message}`;
+      
+      console.error("[BrowseItems] Error fetching items:", errorMessage);
+      setError(errorMessage);
+      setDebugInfo(prev => prev + `Error: ${errorMessage}\n`);
     } finally {
       setLoading(false);
     }
   };
 
   // Keyword search function
-  const handleSearch = async (event) => {
+  const handleSearch = (event) => {
     const value = event.target.value;
     setSearchTerm(value);
     
@@ -89,6 +107,88 @@ export function BrowseItems({ onCartUpdate, username, token }) {
     }
   };
 
+// Render a tag for each search term with ability to remove it
+  const renderSearchTags = () => {
+    if (!searchTerm.trim()) return null;
+
+  const searchTerms = searchTerm
+    .split(',')
+    .map(term => term.trim())
+    .filter(term => term);
+      
+  if (searchTerms.length === 0) return null;
+    
+    return (
+      <div style={{ marginBottom: "1rem", display: "flex", flexWrap: "wrap", gap: "0.5rem" }}>
+        {searchTerms.map((term, index) => (
+          <span key={index} style={{ 
+            backgroundColor: "#e1e1e1", 
+            padding: "0.25rem 0.5rem", 
+            borderRadius: "16px", 
+            fontSize: "0.9rem",
+            display: "flex",
+            alignItems: "center"
+          }}>
+            {term}
+            <button 
+              onClick={() => {
+                // Remove this term
+                const newTerms = searchTerms.filter((_, i) => i !== index);
+                const newSearchTerm = newTerms.join(', ');
+                setSearchTerm(newSearchTerm);
+                fetchItems(selectedCategory, newSearchTerm);
+              }}
+              style={{
+                marginLeft: "0.25rem",
+                background: "none",
+                border: "none",
+                cursor: "pointer",
+                fontSize: "0.8rem",
+                color: "#666"
+              }}
+            >
+              ×
+            </button>
+          </span>
+        ))}
+        {searchTerms.length > 0 && (
+          <button 
+            onClick={() => {
+              setSearchTerm('');
+              fetchItems(selectedCategory, '');
+            }}
+            style={{
+              background: "none",
+              border: "none",
+              cursor: "pointer",
+              fontSize: "0.8rem",
+              color: "#666",
+              padding: "0.25rem 0.5rem"
+            }}
+          >
+            Clear all
+          </button>
+        )}
+      </div>
+    );
+  };
+
+  // // Remove a specific search term
+  // const removeSearchTerm = (termToRemove) => {
+  //   const currentTerms = parseSearchTerms(searchTerm);
+  //   const updatedTerms = currentTerms.filter(term => term !== termToRemove);
+  //   const newSearchTerm = updatedTerms.join(', ');
+    
+  //   setSearchTerm(newSearchTerm);
+  //   fetchItems(selectedCategory, newSearchTerm);
+  // };
+
+  // // Clear all search terms
+  // const clearAllSearchTerms = () => {
+  //   setSearchTerm('');
+  //   fetchItems(selectedCategory, '');
+  // };
+
   return (
     <div style={{ padding: "2rem" }}>
       <h1>Welcome to Exchange4Students Marketplace</h1>
@@ -112,7 +212,7 @@ export function BrowseItems({ onCartUpdate, username, token }) {
       </div>
 
       {/* Keyword Search Bar */}
-      <div>
+      <div style={{ marginBottom: "0.5rem" }}>
         <input
           type="text"
           placeholder="Search..."
@@ -120,7 +220,26 @@ export function BrowseItems({ onCartUpdate, username, token }) {
           onChange={handleSearch}
           style={{ padding: "0.5rem", width: "300px", borderRadius: "4px", border: "1px solid #ccc" }}
         />
+        <button 
+          onClick={() => {
+            fetchItems(selectedCategory, searchTerm);
+          }}
+          style={{
+            marginLeft: "0.5rem",
+            padding: "0.5rem 1rem",
+            backgroundColor: "#4CAF50",
+            color: "white",
+            border: "none",
+            borderRadius: "4px",
+            cursor: "pointer"
+          }}
+        >
+          Search
+        </button>
       </div>
+
+      {/* Display search tags */}
+      {renderSearchTags()}
 
       {/* Display loading, errors, or items */}
       <div className="items">

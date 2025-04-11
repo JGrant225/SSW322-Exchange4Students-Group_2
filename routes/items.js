@@ -35,8 +35,35 @@ router.post("/", verifyToken, upload.single("image"), async (req, res) => {
 
 // Fetch all items
 router.get("/", async (req, res) => {
+  const { category, search } = req.query;
+
+  let query = "SELECT * FROM items";
+  const where = [];
+  const values = [];
+  let index = 1;
+
+  if (category) {
+    where.push(`category = $${index++}`);
+    values.push(category);
+  }
+
+  if (search) {
+    where.push(`(LOWER(title) LIKE $${index} OR LOWER(description) LIKE $${index})`);
+    values.push(`%${search.toLowerCase()}%`);
+    index++;
+  }
+
+  if (where.length > 0) {
+    query += " WHERE " + where.join(" AND ");
+  }
+
+  query += " ORDER BY created_at DESC";
+  
   try {
-    const result = await pool.query("SELECT * FROM items ORDER BY created_at DESC");
+    console.log("Executing query: ", query);
+    console.log("With values:", values);
+    
+    const result = await pool.query(query, values);
     res.json(result.rows);
   } catch (err) {
     console.error("Error fetching items:", err);

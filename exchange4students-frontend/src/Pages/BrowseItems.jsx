@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 
 // BrowseItems component allows buyers to browse items by category and add them to the cart
@@ -7,23 +7,54 @@ export function BrowseItems({ onCartUpdate, username, token }) {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [searchTerm, setSearchTerm] = useState('');
+
+  // Initial load of items
+  useEffect(() => {
+    fetchItems(null, '');
+  }, []);
 
   // Fetch items for selected category
-  const fetchItems = async (category) => {
+  const fetchItems = async (category = selectedCategory, search = searchTerm) => {
     setLoading(true);
     setError(null);
     setItems([]);
 
     try {
-      const response = await axios.get(`${process.env.REACT_APP_API_URL}/items`);
-      const filtered = response.data.filter((item) => item.category === category);
-      setItems(filtered);
+      const params = new URLSearchParams();
+      if (category) params.append("category", category);
+      if (search) params.append("search", search);
+  
+      const response = await axios.get(`${process.env.REACT_APP_API_URL}/items?${params.toString()}`);
+      setItems(response.data);
     } catch (err) {
       console.error("Error fetching items:", err);
       setError("Error fetching items. Please try again.");
     } finally {
       setLoading(false);
     }
+  };
+
+  // Keyword search function
+  const handleSearch = async (event) => {
+    const value = event.target.value;
+    setSearchTerm(value);
+    
+    // Use setTimeout to debounce the search
+    if (window.searchTimeout) {
+      clearTimeout(window.searchTimeout);
+    }
+    
+    window.searchTimeout = setTimeout(() => {
+      fetchItems(selectedCategory, value);
+    }, 500);
+  };
+
+  //Display items matching to keyword
+  const handleCategoryClick = (category) => {
+    const newCategory = category === selectedCategory ? null : category;
+    setSelectedCategory(newCategory);
+    fetchItems(newCategory, searchTerm);
   };
 
   // Add item to cart (sends itemId only)
@@ -68,10 +99,7 @@ export function BrowseItems({ onCartUpdate, username, token }) {
         {["Sports", "Music", "Technology", "Clothes", "Misc"].map((category) => (
           <button
             key={category}
-            onClick={() => {
-              setSelectedCategory(category);
-              fetchItems(category);
-            }}
+            onClick={() => handleCategoryClick(category)}
             style={{
               marginRight: "0.5rem",
               padding: "0.5rem 1rem",
@@ -81,6 +109,17 @@ export function BrowseItems({ onCartUpdate, username, token }) {
             {category}
           </button>
         ))}
+      </div>
+
+      {/* Keyword Search Bar */}
+      <div>
+        <input
+          type="text"
+          placeholder="Search..."
+          value={searchTerm}
+          onChange={handleSearch}
+          style={{ padding: "0.5rem", width: "300px", borderRadius: "4px", border: "1px solid #ccc" }}
+        />
       </div>
 
       {/* Display loading, errors, or items */}

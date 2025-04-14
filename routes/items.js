@@ -17,14 +17,14 @@ const upload = multer({ storage });
 
 // Add new item with optional image and category
 router.post("/", verifyToken, upload.single("image"), async (req, res) => {
-  const { title, description, price, category } = req.body;
+  const { title, description, price, category, dimensions, size, color } = req.body;
   const seller_username = req.user.username;
   const image = req.file ? req.file.filename : null;
 
   try {
     const result = await pool.query(
-      "INSERT INTO items (title, description, price, seller_username, image, category) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *",
-      [title, description, price, seller_username, image, category]
+      "INSERT INTO items (title, description, price, seller_username, image, category, dimensions, size, color) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING *",
+      [title, description, price, seller_username, image, category, dimensions, size, color]
     );
     res.status(201).json(result.rows[0]);
   } catch (err) {
@@ -59,10 +59,16 @@ router.get("/", async (req, res) => {
         // Create a combined search condition with OR operators
         const searchConditions = [];
 
-        
         searchTerms.forEach(term => {
           const paramIndex = queryParams.length + 1;
-          searchConditions.push(`(LOWER(title) LIKE $${paramIndex} OR LOWER(description) LIKE $${paramIndex})`);
+          // Add size, color, and dimensions to search
+          searchConditions.push(`(
+            LOWER(title) LIKE $${paramIndex} OR 
+            LOWER(description) LIKE $${paramIndex} OR 
+            LOWER(COALESCE(size, '')) LIKE $${paramIndex} OR 
+            LOWER(COALESCE(color, '')) LIKE $${paramIndex} OR 
+            LOWER(COALESCE(dimensions, '')) LIKE $${paramIndex}
+          )`);
           queryParams.push(`%${term.toLowerCase()}%`);
         });
         

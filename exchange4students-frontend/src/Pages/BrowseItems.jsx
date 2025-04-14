@@ -8,6 +8,9 @@ export function BrowseItems({ onCartUpdate, username, token }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
+  const [sizeFilter, setSizeFilter] = useState('');
+  const [colorFilter, setColorFilter] = useState('');
+  const [dimensionsFilter, setDimensionsFilter] = useState('');
   const [debugInfo, setDebugInfo] = useState('');
 
   // Initial load of items
@@ -25,13 +28,32 @@ export function BrowseItems({ onCartUpdate, username, token }) {
       // Build query parameters
       const params = new URLSearchParams();
       if (category) params.append("category", category);
-      if (search && search.trim()) params.append("search", search.trim());
+      
+      // Create combined search with filters
+      let combinedSearch = search || '';
+      
+      if (sizeFilter) {
+        combinedSearch += combinedSearch ? `, ${sizeFilter}` : sizeFilter;
+      }
+      
+      if (colorFilter) {
+        combinedSearch += combinedSearch ? `, ${colorFilter}` : colorFilter;
+      }
+      
+      if (dimensionsFilter) {
+        combinedSearch += combinedSearch ? `, ${dimensionsFilter}` : dimensionsFilter;
+      }
+      
+      if (combinedSearch) {
+        params.append("search", combinedSearch.trim());
+      }
       
       const apiUrl = `${process.env.REACT_APP_API_URL}/items`;
       const fullUrl = `${apiUrl}${params.toString() ? `?${params.toString()}` : ''}`;
       
       console.log(`[BrowseItems] Making API request to: ${fullUrl}`);
       setDebugInfo(prev => prev + `Making request to: ${fullUrl}\n`);
+      console.log(`[BrowseItems] Combined search terms: ${combinedSearch}`);
       
       const response = await axios.get(fullUrl);
       
@@ -53,7 +75,7 @@ export function BrowseItems({ onCartUpdate, username, token }) {
     }
   };
 
-  // Keyword search function
+  // Keyword search function with debounce
   const handleSearch = (event) => {
     const value = event.target.value;
     setSearchTerm(value);
@@ -68,14 +90,14 @@ export function BrowseItems({ onCartUpdate, username, token }) {
     }, 500);
   };
 
-  //Display items matching to keyword
+  // Handle category selection
   const handleCategoryClick = (category) => {
     const newCategory = category === selectedCategory ? null : category;
     setSelectedCategory(newCategory);
     fetchItems(newCategory, searchTerm);
   };
 
-  // Add item to cart (sends itemId only)
+  // Add item to cart
   const handleAddToCart = async (itemId) => {
     if (!token || !username) {
       alert("You must be logged in to add items to cart.");
@@ -107,36 +129,58 @@ export function BrowseItems({ onCartUpdate, username, token }) {
     }
   };
 
-// Render a tag for each search term with ability to remove it
+  // Render search tags
   const renderSearchTags = () => {
-    if (!searchTerm.trim()) return null;
-
-  const searchTerms = searchTerm
-    .split(',')
-    .map(term => term.trim())
-    .filter(term => term);
-      
-  if (searchTerms.length === 0) return null;
+    const allTags = [];
+    
+    // Add general search terms
+    if (searchTerm.trim()) {
+      searchTerm.split(',')
+        .map(term => term.trim())
+        .filter(term => term)
+        .forEach(term => allTags.push({ type: 'search', value: term }));
+    }
+    
+    // Add specific filters
+    if (sizeFilter) allTags.push({ type: 'size', value: sizeFilter });
+    if (colorFilter) allTags.push({ type: 'color', value: colorFilter });
+    if (dimensionsFilter) allTags.push({ type: 'dimensions', value: dimensionsFilter });
+    
+    if (allTags.length === 0) return null;
     
     return (
       <div style={{ marginBottom: "1rem", display: "flex", flexWrap: "wrap", gap: "0.5rem" }}>
-        {searchTerms.map((term, index) => (
+        {allTags.map((tag, index) => (
           <span key={index} style={{ 
-            backgroundColor: "#e1e1e1", 
+            backgroundColor: getTagColor(tag.type), 
             padding: "0.25rem 0.5rem", 
             borderRadius: "16px", 
             fontSize: "0.9rem",
             display: "flex",
             alignItems: "center"
           }}>
-            {term}
+            {tag.type !== 'search' && <strong>{tag.type}: </strong>}
+            {tag.value}
             <button 
               onClick={() => {
-                // Remove this term
-                const newTerms = searchTerms.filter((_, i) => i !== index);
-                const newSearchTerm = newTerms.join(', ');
-                setSearchTerm(newSearchTerm);
-                fetchItems(selectedCategory, newSearchTerm);
+                // Remove tag based on type
+                if (tag.type === 'search') {
+                  const newTerms = searchTerm.split(',')
+                    .map(t => t.trim())
+                    .filter(t => t !== tag.value)
+                    .join(', ');
+                  setSearchTerm(newTerms);
+                  fetchItems(selectedCategory, newTerms);
+                } else if (tag.type === 'size') {
+                  setSizeFilter('');
+                  fetchItems(selectedCategory, searchTerm);
+                } else if (tag.type === 'color') {
+                  setColorFilter('');
+                  fetchItems(selectedCategory, searchTerm);
+                } else if (tag.type === 'dimensions') {
+                  setDimensionsFilter('');
+                  fetchItems(selectedCategory, searchTerm);
+                }
               }}
               style={{
                 marginLeft: "0.25rem",
@@ -151,10 +195,13 @@ export function BrowseItems({ onCartUpdate, username, token }) {
             </button>
           </span>
         ))}
-        {searchTerms.length > 0 && (
+        {allTags.length > 0 && (
           <button 
             onClick={() => {
               setSearchTerm('');
+              setSizeFilter('');
+              setColorFilter('');
+              setDimensionsFilter('');
               fetchItems(selectedCategory, '');
             }}
             style={{
@@ -172,22 +219,16 @@ export function BrowseItems({ onCartUpdate, username, token }) {
       </div>
     );
   };
-
-  // // Remove a specific search term
-  // const removeSearchTerm = (termToRemove) => {
-  //   const currentTerms = parseSearchTerms(searchTerm);
-  //   const updatedTerms = currentTerms.filter(term => term !== termToRemove);
-  //   const newSearchTerm = updatedTerms.join(', ');
-    
-  //   setSearchTerm(newSearchTerm);
-  //   fetchItems(selectedCategory, newSearchTerm);
-  // };
-
-  // // Clear all search terms
-  // const clearAllSearchTerms = () => {
-  //   setSearchTerm('');
-  //   fetchItems(selectedCategory, '');
-  // };
+  
+  // Helper function for tag colors
+  const getTagColor = (type) => {
+    switch(type) {
+      case 'size': return "#e6f7ff";
+      case 'color': return "#f0f5ff";
+      case 'dimensions': return "#f6ffed";
+      default: return "#e1e1e1";
+    }
+  };
 
   return (
     <div style={{ padding: "2rem" }}>
@@ -211,7 +252,7 @@ export function BrowseItems({ onCartUpdate, username, token }) {
         ))}
       </div>
 
-      {/* Keyword Search Bar */}
+      {/* Search Bar */}
       <div style={{ marginBottom: "0.5rem" }}>
         <input
           type="text"
@@ -238,6 +279,86 @@ export function BrowseItems({ onCartUpdate, username, token }) {
         </button>
       </div>
 
+      {/* Additional filter fields */}
+      <div style={{ marginBottom: "1rem", display: "flex", flexWrap: "wrap", gap: "0.5rem", alignItems: "center" }}>
+        <div>
+          <label htmlFor="sizeFilter" style={{ fontSize: "0.9rem", marginRight: "0.25rem" }}>Size:</label>
+          <select
+            id="sizeFilter"
+            value={sizeFilter}
+            onChange={(e) => setSizeFilter(e.target.value)}
+            style={{ padding: "0.5rem", borderRadius: "4px", border: "1px solid #ccc" }}
+          >
+            <option value="">Any Size</option>
+            <option value="XS">XS</option>
+            <option value="S">S</option>
+            <option value="M">M</option>
+            <option value="L">L</option>
+            <option value="XL">XL</option>
+            <option value="XXL">XXL</option>
+          </select>
+        </div>
+        
+        <div>
+          <label htmlFor="colorFilter" style={{ fontSize: "0.9rem", marginRight: "0.25rem" }}>Color:</label>
+          <input
+            type="text"
+            id="colorFilter"
+            placeholder="e.g. Red"
+            value={colorFilter}
+            onChange={(e) => setColorFilter(e.target.value)}
+            style={{ padding: "0.5rem", width: "100px", borderRadius: "4px", border: "1px solid #ccc" }}
+          />
+        </div>
+        
+        <div>
+          <label htmlFor="dimensionsFilter" style={{ fontSize: "0.9rem", marginRight: "0.25rem" }}>Dimensions:</label>
+          <input
+            type="text"
+            id="dimensionsFilter"
+            placeholder="e.g. 10x20"
+            value={dimensionsFilter}
+            onChange={(e) => setDimensionsFilter(e.target.value)}
+            style={{ padding: "0.5rem", width: "100px", borderRadius: "4px", border: "1px solid #ccc" }}
+          />
+        </div>
+        
+        <button 
+          onClick={() => {
+            fetchItems(selectedCategory, searchTerm);
+          }}
+          style={{
+            padding: "0.5rem 1rem",
+            backgroundColor: "#4CAF50",
+            color: "white",
+            border: "none",
+            borderRadius: "4px",
+            cursor: "pointer"
+          }}
+        >
+          Apply Filters
+        </button>
+        
+        <button 
+          onClick={() => {
+            setSizeFilter('');
+            setColorFilter('');
+            setDimensionsFilter('');
+            fetchItems(selectedCategory, searchTerm);
+          }}
+          style={{
+            padding: "0.5rem 1rem",
+            backgroundColor: "#f44336",
+            color: "white",
+            border: "none",
+            borderRadius: "4px",
+            cursor: "pointer"
+          }}
+        >
+          Clear Filters
+        </button>
+      </div>
+
       {/* Display search tags */}
       {renderSearchTags()}
 
@@ -257,6 +378,8 @@ export function BrowseItems({ onCartUpdate, username, token }) {
               padding: "1rem",
               marginBottom: "1rem",
               maxWidth: "500px",
+              borderRadius: "4px",
+              boxShadow: "0 2px 4px rgba(0,0,0,0.1)"
             }}
           >
             <h3>{item.title}</h3>
@@ -265,20 +388,29 @@ export function BrowseItems({ onCartUpdate, username, token }) {
             <p><strong>Seller:</strong> {item.seller_username}</p>
             <p><strong>Category:</strong> {item.category || "None"}</p>
 
-            {item.dimensions && <p><strong>Dimensions:</strong> {item.dimensions}</p>}
-            {item.size && item.size !== 'N/A' && <p><strong>Size:</strong> {item.size}</p>}
-            {item.color && <p><strong>Color:</strong> {item.color}</p>}
+            {/* Always show these fields even if empty/null */}
+            <p><strong>Dimensions:</strong> {item.dimensions || "Not specified"}</p>
+            <p><strong>Size:</strong> {item.size && item.size !== 'N/A' ? item.size : "Not applicable"}</p>
+            <p><strong>Color:</strong> {item.color || "Not specified"}</p>
 
             {item.image && (
               <img
                 src={`${process.env.REACT_APP_API_URL}/uploads/${item.image}`}
                 alt={item.title}
-                style={{ width: "150px", height: "auto", marginTop: "0.5rem" }}
+                style={{ width: "150px", height: "auto", marginTop: "0.5rem", borderRadius: "4px" }}
               />
             )}
 
             <button
-              style={{ marginTop: "0.5rem" }}
+              style={{ 
+                marginTop: "0.5rem", 
+                backgroundColor: "#007bff", 
+                color: "white", 
+                border: "none", 
+                padding: "0.5rem 1rem", 
+                borderRadius: "4px",
+                cursor: "pointer"
+              }}
               onClick={() => handleAddToCart(item.id)}
             >
               Add to Cart

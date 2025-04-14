@@ -134,7 +134,7 @@ router.delete("/:id", verifyToken, async (req, res) => {
 router.put("/:id", verifyToken, upload.single("image"), async (req, res) => {
   const itemId = req.params.id;
   const seller_username = req.user.username;
-  const { title, description, price, category } = req.body;
+  const { title, description, price, category, dimensions, size, color } = req.body;
   const image = req.file ? req.file.filename : null;
 
   try {
@@ -166,6 +166,18 @@ router.put("/:id", verifyToken, upload.single("image"), async (req, res) => {
     if (category) {
       fields.push(`category = $${index++}`);
       values.push(category);
+    }
+    if (dimensions) {
+      fields.push(`dimensions = $${index++}`);
+      values.push(dimensions);
+    }
+    if (size) {
+      fields.push(`size = $${index++}`);
+      values.push(size);
+    }
+    if (color) {
+      fields.push(`color = $${index++}`);
+      values.push(color);
     }
     if (image) {
       fields.push(`image = $${index++}`);

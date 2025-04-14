@@ -114,6 +114,9 @@ This backend server provides RESTful API endpoints for basic functionality such 
       seller_username VARCHAR(255),
       image TEXT,
       category TEXT,
+      dimensions TEXT,
+      size TEXT,
+      color TEXT,
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     );
     

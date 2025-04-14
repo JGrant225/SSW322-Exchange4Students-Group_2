@@ -263,6 +263,11 @@ export function BrowseItems({ onCartUpdate, username, token }) {
             <p>{item.description}</p>
             <p><strong>Price:</strong> ${item.price}</p>
             <p><strong>Seller:</strong> {item.seller_username}</p>
+            <p><strong>Category:</strong> {item.category || "None"}</p>
+
+            {item.dimensions && <p><strong>Dimensions:</strong> {item.dimensions}</p>}
+            {item.size && item.size !== 'N/A' && <p><strong>Size:</strong> {item.size}</p>}
+            {item.color && <p><strong>Color:</strong> {item.color}</p>}
 
             {item.image && (
               <img

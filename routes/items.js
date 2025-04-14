@@ -35,61 +35,12 @@ router.post("/", verifyToken, upload.single("image"), async (req, res) => {
 
 // Fetch all items
 router.get("/", async (req, res) => {
-  console.log("Query parameters received:", req.query);
-  const { category, search } = req.query;
-
   try {
-    // Start with a basic query
-    let queryText = "SELECT * FROM items";
-    const queryParams = [];
-    const conditions = [];
-    
-    // Add category filter if provided
-    if (category) {
-      conditions.push(`category = $${queryParams.length + 1}`);
-      queryParams.push(category);
-    }
-    
-    // Add search terms if provided
-    if (search && search.trim()) {
-      const searchTerms = search.split(',').map(term => term.trim()).filter(Boolean);
-      console.log("Parsed search terms:", searchTerms);
-      
-      if (searchTerms.length > 0) {
-        // Create a combined search condition with OR operators
-        const searchConditions = [];
-
-        
-        searchTerms.forEach(term => {
-          const paramIndex = queryParams.length + 1;
-          searchConditions.push(`(LOWER(title) LIKE $${paramIndex} OR LOWER(description) LIKE $${paramIndex})`);
-          queryParams.push(`%${term.toLowerCase()}%`);
-        });
-        
-        // Add the combined search condition
-        conditions.push(`(${searchConditions.join(' OR ')})`);
-      }
-    }
-    
-    // Add WHERE clause if we have conditions
-    if (conditions.length > 0) {
-      queryText += " WHERE " + conditions.join(" AND ");
-    }
-    
-    // Add ordering
-    queryText += " ORDER BY created_at DESC";
-    
-    console.log("Final SQL query:", queryText);
-    console.log("Query parameters:", queryParams);
-    
-    // Execute the query
-    const result = await pool.query(queryText, queryParams);
-    console.log(`Query returned ${result.rows.length} items`);
-    
+    const result = await pool.query("SELECT * FROM items ORDER BY created_at DESC");
     res.json(result.rows);
   } catch (err) {
-    console.error("Error in GET /items:", err);
-    res.status(500).json({ message: "Error fetching items", error: err.message });
+    console.error("Error fetching items:", err);
+    res.status(500).json({ message: "Failed to fetch items" });
   }
 });
 
@@ -134,7 +85,7 @@ router.delete("/:id", verifyToken, async (req, res) => {
 router.put("/:id", verifyToken, upload.single("image"), async (req, res) => {
   const itemId = req.params.id;
   const seller_username = req.user.username;
-  const { title, description, price, category, dimensions, size, color } = req.body;
+  const { title, description, price, category } = req.body;
   const image = req.file ? req.file.filename : null;
 
   try {
@@ -166,18 +117,6 @@ router.put("/:id", verifyToken, upload.single("image"), async (req, res) => {
     if (category) {
       fields.push(`category = $${index++}`);
       values.push(category);
-    }
-    if (dimensions) {
-      fields.push(`dimensions = $${index++}`);
-      values.push(dimensions);
-    }
-    if (size) {
-      fields.push(`size = $${index++}`);
-      values.push(size);
-    }
-    if (color) {
-      fields.push(`color = $${index++}`);
-      values.push(color);
     }
     if (image) {
       fields.push(`image = $${index++}`);

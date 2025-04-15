@@ -9,7 +9,10 @@ const PostItem = ({ username, token, onItemPosted }) => {
     title: "",
     description: "",
     price: "",
-    category: ""
+    category: "",
+    dimensions: "",
+    size: "",
+    color: ""
   });
 
   // State to store selected image file
@@ -25,7 +28,7 @@ const PostItem = ({ username, token, onItemPosted }) => {
 
   // Clear form state when token changes (login/logout)
   useEffect(() => {
-    setForm({ title: "", description: "", price: "", category: "" });
+    setForm({ title: "", description: "", price: "", category: "", dimensions: "", size: "", color: "" });
     setImage(null);
     setMessage("");
   }, [token]);
@@ -78,6 +81,9 @@ const PostItem = ({ username, token, onItemPosted }) => {
       formData.append("description", form.description);
       formData.append("price", form.price);
       formData.append("category", form.category);
+      formData.append("dimensions", form.dimensions);
+      formData.append("size", form.size);
+      formData.append("color", form.color);
       if (image) {
         formData.append("image", image);
       }
@@ -96,7 +102,7 @@ const PostItem = ({ username, token, onItemPosted }) => {
 
       // Reset form and show confirmation
       setMessage("Item posted successfully!");
-      setForm({ title: "", description: "", price: "", category: "" });
+      setForm({ title: "", description: "", price: "", category: "", dimensions: "", size: "", color: "" });
       setImage(null);
 
       // Trigger parent refresh (used in SellerItems)
@@ -160,6 +166,37 @@ const PostItem = ({ username, token, onItemPosted }) => {
               <option value="Misc">Misc</option>
             </select><br />
 
+            {/* Dimensions input */}
+            <input
+              name="dimensions"
+              placeholder="Dimensions (e.g. 10x20)"
+              value={form.dimensions}
+              onChange={handleChange}
+            /><br />
+
+            {/* Size dropdown */}
+            <select
+              name="size"
+              value={form.size}
+              onChange={handleChange}
+            >
+              <option value="">Select Size</option>
+              <option value="XS">XS</option>
+              <option value="S">S</option>
+              <option value="M">M</option>
+              <option value="L">L</option>
+              <option value="XL">XL</option>
+              <option value="XXL">XXL</option>
+            </select><br />
+
+            {/* Color input */}
+            <input
+              name="color"
+              placeholder="Color (e.g. Red)"
+              value={form.color}
+              onChange={handleChange}
+            /><br />
+
             {/* File upload */}
             <label>
               Upload Image:
@@ -207,4 +244,3 @@ const PostItem = ({ username, token, onItemPosted }) => {
 };
 
 export default PostItem;
-

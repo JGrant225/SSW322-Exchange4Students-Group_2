@@ -15,7 +15,10 @@ export default function SellerItems({ username, token, refreshTrigger }) {
     description: "",
     price: "",
     image: null,
-    category: ""
+    category: "",
+    dimensions: "",
+    size: "",
+    color: ""
   });
 
   // Fetch seller's items whenever dependencies change
@@ -67,7 +70,10 @@ export default function SellerItems({ username, token, refreshTrigger }) {
       description: item.description,
       price: item.price,
       image: null,
-      category: "" // Default to blank; if unchanged, keep original
+      category: "", // Default to blank; if unchanged, keep original
+      dimensions: item.dimensions || "",
+      size: item.size || "",
+      color: item.color || ""
     });
   };
 
@@ -95,6 +101,15 @@ export default function SellerItems({ username, token, refreshTrigger }) {
       }
       if (editForm.category) {
         formData.append("category", editForm.category);
+      }
+      if (editForm.dimensions) {
+        formData.append("dimensions", editForm.dimensions);
+      }
+      if (editForm.size) {
+        formData.append("size", editForm.size);
+      }
+      if (editForm.color) {
+        formData.append("color", editForm.color);
       }
 
       await axios.put(
@@ -179,6 +194,37 @@ export default function SellerItems({ username, token, refreshTrigger }) {
               </label>
               <br />
 
+              {/* Additional fields for new attributes */}
+              <input
+                name="dimensions"
+                value={editForm.dimensions}
+                onChange={handleEditChange}
+                placeholder="Dimensions (e.g. 10x20)"
+              /><br />
+              <label>
+                Size:
+                <select
+                  name="size"
+                  value={editForm.size}
+                  onChange={handleEditChange}
+                >
+                  <option value="">(No Change)</option>
+                  <option value="XS">XS</option>
+                  <option value="S">S</option>
+                  <option value="M">M</option>
+                  <option value="L">L</option>
+                  <option value="XL">XL</option>
+                  <option value="XXL">XXL</option>
+                </select>
+              </label>
+              <br />
+              <input
+                name="color"
+                value={editForm.color}
+                onChange={handleEditChange}
+                placeholder="Color (e.g. Red)"
+              /><br />
+
               <input
                 type="file"
                 accept="image/*"
@@ -209,6 +255,9 @@ export default function SellerItems({ username, token, refreshTrigger }) {
               <p>{item.description}</p>
               <p>Price: ${item.price}</p>
               <p>Category: {item.category || "N/A"}</p>
+              <p>Dimensions: {item.dimensions || "Not specified"}</p>
+              <p>Size: {item.size || "Not specified"}</p>
+              <p>Color: {item.color || "Not specified"}</p>
               {item.image && (
                 <img
                   src={`${process.env.REACT_APP_API_URL}/uploads/${item.image}`}

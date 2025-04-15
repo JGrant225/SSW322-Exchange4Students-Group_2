@@ -18,7 +18,8 @@ export default function SellerItems({ username, token, refreshTrigger }) {
     category: "",
     dimensions: "",
     size: "",
-    color: ""
+    color: "",
+    itemStatus: ""
   });
 
   // Fetch seller's items whenever dependencies change
@@ -73,7 +74,8 @@ export default function SellerItems({ username, token, refreshTrigger }) {
       category: "", // Default to blank; if unchanged, keep original
       dimensions: item.dimensions || "",
       size: item.size || "",
-      color: item.color || ""
+      color: item.color || "",
+      itemStatus: item.itemStatus || "Available"
     });
   };
 
@@ -96,6 +98,7 @@ export default function SellerItems({ username, token, refreshTrigger }) {
       formData.append("title", editForm.title);
       formData.append("description", editForm.description);
       formData.append("price", editForm.price);
+      formData.append("price", editForm.itemStatus);
       if (editForm.image) {
         formData.append("image", editForm.image);
       }
@@ -231,6 +234,21 @@ export default function SellerItems({ username, token, refreshTrigger }) {
                 onChange={handleImageChange}
               /><br />
 
+              {/* Item Status */}
+              <label>
+                Item Status:
+                <select
+                  name="itemStatus"
+                  value={editForm.itemStatus}
+                  onChange={handleEditChange}
+                >
+                  <option value="">(No Change)</option>
+                  <option value="available">Available</option>
+                  <option value="onHold">On Hold</option>
+                  <option value="sold">Sold</option>
+                </select>
+              </label>
+
               {/* Image preview if a new image is selected */}
               {editForm.image && (
                 <div style={{ marginTop: "0.5rem" }}>
@@ -258,6 +276,7 @@ export default function SellerItems({ username, token, refreshTrigger }) {
               <p>Dimensions: {item.dimensions || "Not specified"}</p>
               <p>Size: {item.size || "Not specified"}</p>
               <p>Color: {item.color || "Not specified"}</p>
+              <p>Item Status: {item.itemStatus || "Available"}</p>        
               {item.image && (
                 <img
                   src={`${process.env.REACT_APP_API_URL}/uploads/${item.image}`}

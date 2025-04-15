@@ -23,8 +23,8 @@ router.post("/", verifyToken, upload.single("image"), async (req, res) => {
 
   try {
     const result = await pool.query(
-      "INSERT INTO items (title, description, price, seller_username, image, category, dimensions, size, color) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING *",
-      [title, description, price, seller_username, image, category, dimensions, size, color]
+      "INSERT INTO items (title, description, price, seller_username, image, category, dimensions, size, color, itemstatus) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING *",
+      [title, description, price, seller_username, image, category, dimensions, size, color, itemstatus]
     );
     res.status(201).json(result.rows[0]);
   } catch (err) {
@@ -188,6 +188,10 @@ router.put("/:id", verifyToken, upload.single("image"), async (req, res) => {
     if (image) {
       fields.push(`image = $${index++}`);
       values.push(image);
+    }
+    if (itemstatus) {
+      fields.push(`itemstatus = $${index++}`);
+      values.push(itemstatus);
     }
 
     if (fields.length === 0) {

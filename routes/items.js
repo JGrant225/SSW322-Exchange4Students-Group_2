@@ -17,14 +17,14 @@ const upload = multer({ storage });
 
 // Add new item with optional image and category
 router.post("/", verifyToken, upload.single("image"), async (req, res) => {
-  const { title, description, price, category, dimensions, size, color } = req.body;
+  const { title, description, price, category, dimensions, size, color, itemStatus } = req.body;
   const seller_username = req.user.username;
   const image = req.file ? req.file.filename : null;
 
   try {
     const result = await pool.query(
       "INSERT INTO items (title, description, price, seller_username, image, category, dimensions, size, color, itemstatus) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING *",
-      [title, description, price, seller_username, image, category, dimensions, size, color, itemstatus]
+      [title, description, price, seller_username, image, category, dimensions, size, color, itemStatus]
     );
     res.status(201).json(result.rows[0]);
   } catch (err) {
@@ -140,7 +140,7 @@ router.delete("/:id", verifyToken, async (req, res) => {
 router.put("/:id", verifyToken, upload.single("image"), async (req, res) => {
   const itemId = req.params.id;
   const seller_username = req.user.username;
-  const { title, description, price, category, dimensions, size, color } = req.body;
+  const { title, description, price, category, dimensions, size, color, itemStatus } = req.body;
   const image = req.file ? req.file.filename : null;
 
   try {
@@ -189,9 +189,9 @@ router.put("/:id", verifyToken, upload.single("image"), async (req, res) => {
       fields.push(`image = $${index++}`);
       values.push(image);
     }
-    if (itemstatus) {
-      fields.push(`itemstatus = $${index++}`);
-      values.push(itemstatus);
+    if (itemStatus) {
+      fields.push(`itemStatus = $${index++}`);
+      values.push(itemStatus);
     }
 
     if (fields.length === 0) {

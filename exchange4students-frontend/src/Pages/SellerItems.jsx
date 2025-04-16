@@ -98,7 +98,7 @@ export default function SellerItems({ username, token, refreshTrigger }) {
       formData.append("title", editForm.title);
       formData.append("description", editForm.description);
       formData.append("price", editForm.price);
-      formData.append("price", editForm.itemStatus);
+      formData.append("itemStatus", editForm.itemStatus);
       if (editForm.image) {
         formData.append("image", editForm.image);
       }

@@ -392,7 +392,7 @@ export function BrowseItems({ onCartUpdate, username, token }) {
             <p><strong>Dimensions:</strong> {item.dimensions || "Not specified"}</p>
             <p><strong>Size:</strong> {item.size && item.size !== 'N/A' ? item.size : "Not applicable"}</p>
             <p><strong>Color:</strong> {item.color || "Not specified"}</p>
-            <p><strong>Item Status:</strong> {item.itemStatus || "Available"}</p>
+            <p><strong>Item Status:</strong> {item.itemstatus || "Available"}</p>
 
             {item.image && (
               <img

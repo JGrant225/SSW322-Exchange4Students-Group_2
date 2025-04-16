@@ -75,7 +75,7 @@ export default function SellerItems({ username, token, refreshTrigger }) {
       dimensions: item.dimensions || "",
       size: item.size || "",
       color: item.color || "",
-      itemstatus: item.itemstatus || "available"
+      itemstatus: item.itemstatus || "Available"
     });
   };
 
@@ -275,7 +275,7 @@ export default function SellerItems({ username, token, refreshTrigger }) {
               <p>Dimensions: {item.dimensions || "Not specified"}</p>
               <p>Size: {item.size || "Not specified"}</p>
               <p>Color: {item.color || "Not specified"}</p>
-              <p>Item Status: {item.itemstatus || "available"}</p>        
+              <p>Item Status: {item.itemstatus || "Available"}</p>        
               {item.image && (
                 <img
                   src={`${process.env.REACT_APP_API_URL}/uploads/${item.image}`}

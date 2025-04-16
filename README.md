@@ -117,7 +117,7 @@ This backend server provides RESTful API endpoints for basic functionality such 
       image TEXT,
       size TEXT,
       color TEXT,
-      itemstatus VARCHAR(20) DEFAULT 'Available',
+      itemstatus VARCHAR(20) DEFAULT 'Available' CHECK (itemstatus IN ('Available', 'On Hold', 'Sold')),
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     );
     

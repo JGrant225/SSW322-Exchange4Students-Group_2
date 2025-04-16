@@ -24,6 +24,8 @@ Exchange4Students enables students to:
 - A seller can create a post to sell an item, which could be of any type, with the respective information of the item type collected
 - A buyer can browse previously posted items and select an item to view details
 - A seller can edit or delete any of their posted items
+- Buyers can browse items by category, keywords, dimensions, size, and color
+- Sellers can mark items as "on hold,” “sold,” or “available”
 
 ## Technologies Used
 

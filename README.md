@@ -105,7 +105,7 @@ This backend server provides RESTful API endpoints for basic functionality such 
       password TEXT NOT NULL
     );
 
-    -- Items table --
+    -- Items Table --
     CREATE TABLE items (
       id SERIAL PRIMARY KEY,
       title VARCHAR(255) NOT NULL,
@@ -114,10 +114,14 @@ This backend server provides RESTful API endpoints for basic functionality such 
       seller_username VARCHAR(255),
       image TEXT,
       category TEXT,
+      dimensions TEXT,
+      size TEXT,
+      color TEXT,
+      itemstatus VARCHAR(20) DEFAULT 'Available' CHECK (itemstatus IN ('Available', 'On Hold', 'Sold')),
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     );
-    
-    -- Cart Items --
+
+    -- Cart Items Table --
     CREATE TABLE cart_items (
       id SERIAL PRIMARY KEY,
       buyer_username TEXT NOT NULL,
@@ -126,8 +130,8 @@ This backend server provides RESTful API endpoints for basic functionality such 
       added_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
       UNIQUE (buyer_username, item_id)
     );
-    
-    -- Create Orders Table --
+
+    -- Orders Table --
     CREATE TABLE orders (
       id SERIAL PRIMARY KEY,
       buyer_username TEXT NOT NULL,
@@ -135,11 +139,23 @@ This backend server provides RESTful API endpoints for basic functionality such 
       placed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     );
 
-    -- Create Order Items Table --
+    -- Order Items Table --
     CREATE TABLE order_items (
       id SERIAL PRIMARY KEY,
       order_id INTEGER REFERENCES orders(id) ON DELETE CASCADE,
       item_id INTEGER REFERENCES items(id),
       quantity INTEGER,
       price NUMERIC(10,2)
+    );
+
+    -- Buy Requests Table --
+    CREATE TABLE buy_requests (
+      id SERIAL PRIMARY KEY,
+      buyer_username TEXT NOT NULL,
+      item_id INTEGER REFERENCES items(id) ON DELETE CASCADE,
+      contact_email TEXT NOT NULL,
+      contact_phone TEXT NOT NULL,
+      message TEXT,
+      request_status VARCHAR(20) DEFAULT 'Pending' CHECK (request_status IN ('Pending', 'Approved', 'Rejected')),
+      requested_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     );

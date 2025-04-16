@@ -24,7 +24,7 @@ router.post("/", verifyToken, upload.single("image"), async (req, res) => {
   try {
     const result = await pool.query(
       "INSERT INTO items (title, description, price, seller_username, image, category, dimensions, size, color, itemstatus) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING *",
-      [title, description, price, seller_username, image, category, dimensions, size, color, itemstatus]
+      [title, description, price, seller_username, image, category, dimensions, size, color, 'Available']
     );
     res.status(201).json(result.rows[0]);
   } catch (err) {
@@ -43,25 +43,23 @@ router.get("/", async (req, res) => {
     let queryText = "SELECT * FROM items";
     const queryParams = [];
     const conditions = [];
-    
+
     // Add category filter if provided
     if (category) {
       conditions.push(`category = $${queryParams.length + 1}`);
       queryParams.push(category);
     }
-    
+
     // Add search terms if provided
     if (search && search.trim()) {
       const searchTerms = search.split(',').map(term => term.trim()).filter(Boolean);
       console.log("Parsed search terms:", searchTerms);
-      
+
       if (searchTerms.length > 0) {
-        // Create a combined search condition with OR operators
         const searchConditions = [];
 
         searchTerms.forEach(term => {
           const paramIndex = queryParams.length + 1;
-          // Add size, color, and dimensions to search
           searchConditions.push(`(
             LOWER(title) LIKE $${paramIndex} OR 
             LOWER(description) LIKE $${paramIndex} OR 
@@ -71,27 +69,21 @@ router.get("/", async (req, res) => {
           )`);
           queryParams.push(`%${term.toLowerCase()}%`);
         });
-        
-        // Add the combined search condition
         conditions.push(`(${searchConditions.join(' OR ')})`);
       }
     }
-    
-    // Add WHERE clause if we have conditions
+
     if (conditions.length > 0) {
       queryText += " WHERE " + conditions.join(" AND ");
     }
-    
-    // Add ordering
+
     queryText += " ORDER BY created_at DESC";
-    
     console.log("Final SQL query:", queryText);
     console.log("Query parameters:", queryParams);
-    
-    // Execute the query
+
     const result = await pool.query(queryText, queryParams);
     console.log(`Query returned ${result.rows.length} items`);
-    
+
     res.json(result.rows);
   } catch (err) {
     console.error("Error in GET /items:", err);
@@ -136,11 +128,11 @@ router.delete("/:id", verifyToken, async (req, res) => {
   }
 });
 
-// Update an item posted by the logged-in seller (including optional new image or category)
+// Update an item posted by the logged-in seller
 router.put("/:id", verifyToken, upload.single("image"), async (req, res) => {
   const itemId = req.params.id;
   const seller_username = req.user.username;
-  const { title, description, price, category, dimensions, size, color } = req.body;
+  const { title, description, price, category, dimensions, size, color, itemstatus } = req.body;
   const image = req.file ? req.file.filename : null;
 
   try {
@@ -214,6 +206,47 @@ router.put("/:id", verifyToken, upload.single("image"), async (req, res) => {
   } catch (err) {
     console.error("Error updating item:", err);
     res.status(500).json({ message: "Failed to update item" });
+  }
+});
+
+// Fetch all buy requests for items sold by logged-in seller
+router.get("/buyrequests", verifyToken, async (req, res) => {
+  const seller = req.user.username;
+  try {
+    const result = await pool.query(
+      `SELECT br.*, i.title, i.image
+       FROM buy_requests br
+       JOIN items i ON br.item_id = i.id
+       WHERE i.seller_username = $1
+       ORDER BY br.requested_at DESC`,
+      [seller]
+    );
+    res.json(result.rows);
+  } catch (err) {
+    console.error("Error fetching buy requests:", err);
+    res.status(500).json({ message: "Failed to fetch buy requests" });
+  }
+});
+
+// Update item status (Available, On Hold, Sold) by item ID
+router.put("/:id/status", verifyToken, async (req, res) => {
+  const itemId = req.params.id;
+  const { status } = req.body;
+
+  try {
+    const result = await pool.query(
+      "UPDATE items SET itemstatus = $1 WHERE id = $2 RETURNING *",
+      [status, itemId]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ message: "Item not found or update failed" });
+    }
+
+    res.json(result.rows[0]);
+  } catch (err) {
+    console.error("Error updating item status:", err);
+    res.status(500).json({ message: "Failed to update item status" });
   }
 });
 

@@ -20,21 +20,37 @@ export function LoginPage({ onCartUpdate, onRoleChange }) {
     setToken("");
     localStorage.removeItem("token");
     localStorage.removeItem("username");
+    localStorage.removeItem("role");
+    onRoleChange("");
     navigate("/");
   };
 
-  // Initialize from passed state or redirect
+  // Initialize user and role from login or persistent session
   useEffect(() => {
     const state = location.state;
+    const savedUsername = localStorage.getItem("username");
+    const savedToken = localStorage.getItem("token");
+    const savedRole = localStorage.getItem("role");
+
     if (state && state.username && state.token) {
       setUsername(state.username);
       setToken(state.token);
       localStorage.setItem("username", state.username);
       localStorage.setItem("token", state.token);
+
+      const loginRole = state.role || savedRole || "seller";
+      setSelectedTab(loginRole);
+      localStorage.setItem("role", loginRole);
+      onRoleChange(loginRole);
+    } else if (savedUsername && savedToken) {
+      setUsername(savedUsername);
+      setToken(savedToken);
+      setSelectedTab(savedRole || "seller");
+      onRoleChange(savedRole || "seller");
     } else {
       navigate("/");
     }
-  }, [location, navigate]);
+  }, [location, navigate, onRoleChange]);
 
   const handleItemPosted = () => {
     setRefreshItems((prev) => !prev);
@@ -53,8 +69,20 @@ export function LoginPage({ onCartUpdate, onRoleChange }) {
 
       <h2>Choose a role:</h2>
       <div>
-        <button onClick={() => { setSelectedTab("seller"); onRoleChange("seller"); }}>Seller</button>
-        <button onClick={() => { setSelectedTab("buyer"); onRoleChange("buyer"); }}>Buyer</button>
+        <button onClick={() => {
+          setSelectedTab("seller");
+          onRoleChange("seller");
+          localStorage.setItem("role", "seller");
+        }}>
+          Seller
+        </button>
+        <button onClick={() => {
+          setSelectedTab("buyer");
+          onRoleChange("buyer");
+          localStorage.setItem("role", "buyer");
+        }}>
+          Buyer
+        </button>
       </div>
 
       <hr />
@@ -68,7 +96,7 @@ export function LoginPage({ onCartUpdate, onRoleChange }) {
       )}
 
       {/* Buyer view */}
-      {selectedTab === "buyer" && (
+      {selectedTab === "buyer" && username && token && (
         <BrowseItems
           onCartUpdate={onCartUpdate}
           username={username}

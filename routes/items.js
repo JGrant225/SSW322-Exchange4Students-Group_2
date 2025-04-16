@@ -17,14 +17,14 @@ const upload = multer({ storage });
 
 // Add new item with optional image and category
 router.post("/", verifyToken, upload.single("image"), async (req, res) => {
-  const { title, description, price, category, dimensions, size, color, itemStatus } = req.body;
+  const { title, description, price, category, dimensions, size, color, itemstatus } = req.body;
   const seller_username = req.user.username;
   const image = req.file ? req.file.filename : null;
 
   try {
     const result = await pool.query(
       "INSERT INTO items (title, description, price, seller_username, image, category, dimensions, size, color, itemstatus) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING *",
-      [title, description, price, seller_username, image, category, dimensions, size, color, itemStatus]
+      [title, description, price, seller_username, image, category, dimensions, size, color, itemstatus]
     );
     res.status(201).json(result.rows[0]);
   } catch (err) {
@@ -43,18 +43,18 @@ router.get("/", async (req, res) => {
     let queryText = "SELECT * FROM items";
     const queryParams = [];
     const conditions = [];
-    
+
     // Add category filter if provided
     if (category) {
       conditions.push(`category = $${queryParams.length + 1}`);
       queryParams.push(category);
     }
-    
+
     // Add search terms if provided
     if (search && search.trim()) {
       const searchTerms = search.split(',').map(term => term.trim()).filter(Boolean);
       console.log("Parsed search terms:", searchTerms);
-      
+
       if (searchTerms.length > 0) {
         // Create a combined search condition with OR operators
         const searchConditions = [];
@@ -71,27 +71,27 @@ router.get("/", async (req, res) => {
           )`);
           queryParams.push(`%${term.toLowerCase()}%`);
         });
-        
+
         // Add the combined search condition
         conditions.push(`(${searchConditions.join(' OR ')})`);
       }
     }
-    
+
     // Add WHERE clause if we have conditions
     if (conditions.length > 0) {
       queryText += " WHERE " + conditions.join(" AND ");
     }
-    
+
     // Add ordering
     queryText += " ORDER BY created_at DESC";
-    
+
     console.log("Final SQL query:", queryText);
     console.log("Query parameters:", queryParams);
-    
+
     // Execute the query
     const result = await pool.query(queryText, queryParams);
     console.log(`Query returned ${result.rows.length} items`);
-    
+
     res.json(result.rows);
   } catch (err) {
     console.error("Error in GET /items:", err);
@@ -140,7 +140,7 @@ router.delete("/:id", verifyToken, async (req, res) => {
 router.put("/:id", verifyToken, upload.single("image"), async (req, res) => {
   const itemId = req.params.id;
   const seller_username = req.user.username;
-  const { title, description, price, category, dimensions, size, color, itemStatus } = req.body;
+  const { title, description, price, category, dimensions, size, color, itemstatus } = req.body;
   const image = req.file ? req.file.filename : null;
 
   try {
@@ -189,9 +189,9 @@ router.put("/:id", verifyToken, upload.single("image"), async (req, res) => {
       fields.push(`image = $${index++}`);
       values.push(image);
     }
-    if (itemStatus) {
-      fields.push(`itemStatus = $${index++}`);
-      values.push(itemStatus);
+    if (itemstatus) {
+      fields.push(`itemstatus = $${index++}`);
+      values.push(itemstatus);
     }
 
     if (fields.length === 0) {

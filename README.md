@@ -112,8 +112,12 @@ This backend server provides RESTful API endpoints for basic functionality such 
       description TEXT,
       price NUMERIC(10,2) NOT NULL,
       seller_username VARCHAR(255),
-      image TEXT,
       category TEXT,
+      dimensions TEXT,
+      image TEXT,
+      size TEXT,
+      color TEXT,
+      itemstatus TEXT DEFAULT 'available',
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     );
     

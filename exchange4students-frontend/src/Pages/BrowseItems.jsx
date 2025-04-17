@@ -361,12 +361,19 @@ export function BrowseItems({ onCartUpdate, username, token }) {
               />
             )}
 
-            <button
-              style={{ ...styles.button, backgroundColor: "#007bff", marginTop: "0.5rem" }}
-              onClick={() => handleAddToCart(item.id)}
-            >
-              Add to Cart
-            </button>
+            {item.itemstatus === "Available" ? (
+              <button
+                style={{ ...styles.button, backgroundColor: "#007bff", marginTop: "0.5rem" }}
+                onClick={() => handleAddToCart(item.id)}
+              >
+                Add to Cart
+              </button>
+            ) : (
+              <p style={{ color: "red", fontWeight: "bold" }}>
+                Item not available for purchase ({item.itemstatus})
+              </p>
+            )}
+
           </div>
         ))}
       </div>

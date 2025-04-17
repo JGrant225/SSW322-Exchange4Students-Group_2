@@ -58,6 +58,31 @@ router.get("/seller", verifyToken, async (req, res) => {
   }
 });
 
+// Get all buy requests for the logged-in buyer
+router.get("/buyer", verifyToken, async (req, res) => {
+  const buyer = req.user.username;
+  console.log("[GET] Buyer checking requests:", buyer);
+
+  try {
+    const result = await pool.query(
+      `SELECT 
+         br.id, br.item_id, br.request_status, br.requested_at,
+         i.title AS item_title, i.image AS item_image, i.itemstatus
+       FROM buy_requests br
+       JOIN items i ON br.item_id = i.id
+       WHERE br.buyer_username = $1
+       ORDER BY br.requested_at DESC`,
+      [buyer]
+    );
+
+    res.json(result.rows);
+  } catch (err) {
+    console.error("[GET] Error fetching buyer requests:", err);
+    res.status(500).json({ message: "Failed to fetch buyer requests" });
+  }
+});
+
+
 // Accept a buy request and reject others
 router.put("/:id/accept", verifyToken, async (req, res) => {
   const seller = req.user.username;

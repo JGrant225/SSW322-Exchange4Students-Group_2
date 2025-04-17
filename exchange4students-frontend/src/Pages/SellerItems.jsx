@@ -248,7 +248,10 @@ export default function SellerItems({ username, token, refreshTrigger }) {
                 value={editForm.title}
                 onChange={handleEditChange}
                 placeholder="Title"
-                style={styles.input}
+                style={{
+                  padding: "20px",
+                  backgroundColor: "yellow",
+                  fontSize: "1.5rem"}}
               />
               <textarea
                 name="description"
@@ -359,7 +362,7 @@ export default function SellerItems({ username, token, refreshTrigger }) {
                 >
                   Cancel
                 </button>
-              </div>
+              </div>  
             </form>
           ) : (
             <>

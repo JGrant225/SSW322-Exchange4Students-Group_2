@@ -36,6 +36,7 @@ Exchange4Students enables students to:
 - **OpenSSL** – Local HTTPS certificate generation
 - **React.js** - Frontend library to develop UI
 - **Multer** - Middleware for Node to handle form data (File Upload)
+- **CSS** - UI styling
 
 ## Installation
 1. Open a terminal

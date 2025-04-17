@@ -34,7 +34,11 @@ export default function Home(){
 
   return (
     <div style={{ padding: "2rem" }}>
-      <h1>Exchange4Students</h1>
+      <h1
+        style={{
+          textAlign: "center",
+        }}
+      >Welcome to Exchange4Students!</h1>
 
       {/* If logged in, show logout info */}
       {username && (

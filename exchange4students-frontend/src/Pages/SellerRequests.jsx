@@ -10,6 +10,7 @@ export default function SellerRequests({ username, token }) {
 
   // Fetch buy requests for the seller
   const fetchRequests = async () => {
+    if (!username ||  !token) return;
     try {
       const res = await axios.get(`${process.env.REACT_APP_API_URL}/buyrequests/seller`, {
         headers: { Authorization: `Bearer ${token}` }
@@ -23,10 +24,23 @@ export default function SellerRequests({ username, token }) {
   };
 
   useEffect(() => {
+    if (!username || !token) return;
+  
+    let isActive = true;
+    console.log("[SellerRequests] Setting up polling for", username);
+  
     fetchRequests();
-    const interval = setInterval(fetchRequests, 5000);
-    return () => clearInterval(interval);
-  }, [token]);
+    const interval = setInterval(() => {
+      if (isActive) fetchRequests();
+    }, 5000);
+  
+    return () => {
+      isActive = false;
+      console.log("[SellerRequests] Clearing polling for", username);
+      clearInterval(interval);
+    };
+  }, [token, username]);
+   
 
   // Accept a specific buy request
   const handleAcceptRequest = async (requestId) => {

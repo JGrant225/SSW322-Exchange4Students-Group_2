@@ -61,7 +61,7 @@ export default function CheckoutPage() {
 
     try {
       for (const item of cartItems) {
-        await axios.post(`${process.env.REACT_APP_API_URL}/buy_requests`, {
+        await axios.post(`${process.env.REACT_APP_API_URL}/buyrequests`, {
           item_id: item.id,
           contact_email: form.email,
           contact_phone: form.phone,

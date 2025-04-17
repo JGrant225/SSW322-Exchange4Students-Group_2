@@ -42,7 +42,11 @@ export function LoginPage({ onCartUpdate, onRoleChange }) {
 
   return (
     <div style={{ padding: "2rem" }}>
-      <h1>Exchange4Students</h1>
+      <h1
+        style={{
+          textAlign: "center",
+        }}
+      >Welcome to Exchange4Students!</h1>
 
       {username && (
         <>
@@ -51,10 +55,25 @@ export function LoginPage({ onCartUpdate, onRoleChange }) {
         </>
       )}
 
-      <h2>Choose a role:</h2>
-      <div>
-        <button onClick={() => { setSelectedTab("seller"); onRoleChange("seller"); }}>Seller</button>
-        <button onClick={() => { setSelectedTab("buyer"); onRoleChange("buyer"); }}>Buyer</button>
+      <h2
+        style={{
+          textAlign: "center",
+        }}        
+      >Choose a role:</h2>
+      <div
+        style={{
+          textAlign: "center",
+        }}      
+      >
+        <button onClick={() => { setSelectedTab("seller"); onRoleChange("seller"); }} style={{
+          cursor: "pointer",
+          padding: "0.5rem 1rem",
+          marginRight: "1rem",
+        }}>Seller</button>
+        <button onClick={() => { setSelectedTab("buyer"); onRoleChange("buyer"); }}style={{
+          cursor: "pointer",
+          padding: "0.5rem 1rem",
+        }}>Buyer</button>
       </div>
 
       <hr />

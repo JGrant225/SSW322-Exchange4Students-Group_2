@@ -1,51 +1,56 @@
 import './App.css';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import Home from './Pages/Home';
 import { LoginPage } from './Pages/LoginPage';
 import BrowseItems from './Pages/BrowseItems';
 import Cart from './Pages/Cart';
 import CheckoutPage from './Pages/CheckoutPage';
 import SellerRequests from './Pages/SellerRequests';
+import BuyerRequests from './Pages/BuyerRequests';
 import React, { useState } from 'react';
 
-function App() {
-  const [token, setToken] = useState(localStorage.getItem("token") || "");
-  const [username, setUsername] = useState(localStorage.getItem("username") || "");
-
-  // Track buyer/seller role
+function AppWrapper() {
+  const location = useLocation();
+  const [token, setToken] = useState("");
+  const [username, setUsername] = useState("");
   const [userRole, setUserRole] = useState("");
-
-  // Trigger to refresh cart
   const [cartUpdateTrigger, setCartUpdateTrigger] = useState(0);
 
   const handleCartUpdate = () => {
-    setCartUpdateTrigger((prev) => prev + 1);
+    setCartUpdateTrigger(prev => prev + 1);
   };
 
-  // Update role and persist username/token on login
   const handleRoleChange = (role) => {
     setUserRole(role);
     setToken(localStorage.getItem("token") || "");
     setUsername(localStorage.getItem("username") || "");
   };
 
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("username");
+    localStorage.removeItem("role");
+
+    setUserRole("");
+    setToken("");
+    setUsername("");
+  };
+
+  const isHomePage = location.pathname === "/";
+
   return (
-    <Router>
-      {/* Only show Cart if role is 'buyer' and logged in */}
-      {userRole === "buyer" && token && (
-        <Cart
-          username={username}
-          token={token}
-          refreshTrigger={cartUpdateTrigger}
-        />
+    <>
+      {/* Buyer features */}
+      {userRole === "buyer" && token && !isHomePage && (
+        <>
+          <Cart username={username} token={token} refreshTrigger={cartUpdateTrigger} />
+          <BuyerRequests username={username} token={token} />
+        </>
       )}
 
-      {/* Only show SellerRequests if role is 'seller' and logged in */}
-      {userRole === "seller" && token && (
-        <SellerRequests
-          username={username}
-          token={token}
-        />
+      {/* Seller features */}
+      {userRole === "seller" && token && !isHomePage && (
+        <SellerRequests username={username} token={token} />
       )}
 
       <Routes>
@@ -56,6 +61,7 @@ function App() {
             <LoginPage
               onCartUpdate={handleCartUpdate}
               onRoleChange={handleRoleChange}
+              onLogout={handleLogout}
             />
           }
         />
@@ -74,8 +80,14 @@ function App() {
           }
         />
       </Routes>
-    </Router>
+    </>
   );
 }
 
-export default App;
+export default function App() {
+  return (
+    <Router>
+      <AppWrapper />
+    </Router>
+  );
+}

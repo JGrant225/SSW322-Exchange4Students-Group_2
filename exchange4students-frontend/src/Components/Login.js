@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import axios from "axios";
+import "./Login.css";
 
 // Login component handles user authentication form
 const Login = ({ onLoginSuccess }) => {
@@ -36,7 +37,7 @@ const Login = ({ onLoginSuccess }) => {
   };
 
   return (
-    <div>
+    <div className="login-container">
       <h2>Login</h2>
       <form onSubmit={handleSubmit}>
         <input

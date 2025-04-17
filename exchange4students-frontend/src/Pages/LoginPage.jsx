@@ -5,7 +5,7 @@ import SellerItems from "./SellerItems";
 import BrowseItems from "./BrowseItems";
 
 // LoginPage handles role selection and renders seller/buyer specific content
-export function LoginPage({ onCartUpdate, onRoleChange }) {
+export function LoginPage({ onCartUpdate, onRoleChange, onLogout }) {
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -16,13 +16,17 @@ export function LoginPage({ onCartUpdate, onRoleChange }) {
 
   // On logout, clear state and storage
   const handleLogout = () => {
-    setUsername("");
-    setToken("");
     localStorage.removeItem("token");
     localStorage.removeItem("username");
     localStorage.removeItem("role");
+    setUsername("");
+    setToken("");
+    onLogout();
     onRoleChange("");
     navigate("/");
+    console.log("App State after logout:", {
+      userRole: "", username: "", token: ""
+    });
   };
 
   // Initialize user and role from login or persistent session
@@ -58,31 +62,56 @@ export function LoginPage({ onCartUpdate, onRoleChange }) {
 
   return (
     <div style={{ padding: "2rem" }}>
-      <h1>Exchange4Students</h1>
+      <h1 style={{ textAlign: "center" }}>
+        Welcome to Exchange4Students!
+      </h1>
 
       {username && (
         <>
           <p>Logged in as: <strong>{username}</strong></p>
-          <button onClick={handleLogout}>Logout</button>
+          <button onClick={handleLogout} style={{
+            cursor: "pointer",
+            marginRight: "1rem",
+            transition: "all 0.2s ease",
+            padding: "0.5rem 1rem",
+            borderRadius: "4px",
+            border: "none",
+            backgroundColor: "#4caf50",
+            color: "#fff",
+          }}>Logout</button>
         </>
       )}
 
-      <h2>Choose a role:</h2>
-      <div>
+      <h2 style={{ textAlign: "center" }}>Choose a role:</h2>
+      <div style={{ textAlign: "center" }}>
         <button onClick={() => {
           setSelectedTab("seller");
           onRoleChange("seller");
           localStorage.setItem("role", "seller");
-        }}>
-          Seller
-        </button>
+        }} style={{
+          cursor: "pointer",
+          marginRight: "1rem",
+          transition: "all 0.2s ease",
+          padding: "0.5rem 1rem",
+          borderRadius: "4px",
+          border: "none",
+          backgroundColor: "#4caf50",
+          color: "#fff",
+        }}>Seller</button>
         <button onClick={() => {
           setSelectedTab("buyer");
           onRoleChange("buyer");
           localStorage.setItem("role", "buyer");
-        }}>
-          Buyer
-        </button>
+        }} style={{
+          cursor: "pointer",
+          marginRight: "1rem",
+          transition: "all 0.2s ease",
+          padding: "0.5rem 1rem",
+          borderRadius: "4px",
+          border: "none",
+          backgroundColor: "#4caf50",
+          color: "#fff",
+        }}>Buyer</button>
       </div>
 
       <hr />

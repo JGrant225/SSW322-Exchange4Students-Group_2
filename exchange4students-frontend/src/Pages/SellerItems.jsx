@@ -19,7 +19,7 @@ export default function SellerItems({ username, token, refreshTrigger }) {
     dimensions: "",
     size: "",
     color: "",
-    itemStatus: ""
+    itemstatus: ""
   });
 
   // Fetch seller's items whenever dependencies change
@@ -71,11 +71,11 @@ export default function SellerItems({ username, token, refreshTrigger }) {
       description: item.description,
       price: item.price,
       image: null,
-      category: "", // Default to blank; if unchanged, keep original
+      category: item.category || "",
       dimensions: item.dimensions || "",
       size: item.size || "",
       color: item.color || "",
-      itemStatus: item.itemStatus || "Available"
+      itemstatus: item.itemstatus || "Available"
     });
   };
 
@@ -98,7 +98,7 @@ export default function SellerItems({ username, token, refreshTrigger }) {
       formData.append("title", editForm.title);
       formData.append("description", editForm.description);
       formData.append("price", editForm.price);
-      formData.append("itemStatus", editForm.itemStatus);
+      formData.append("itemstatus", editForm.itemstatus);
       if (editForm.image) {
         formData.append("image", editForm.image);
       }
@@ -238,14 +238,13 @@ export default function SellerItems({ username, token, refreshTrigger }) {
               <label>
                 Item Status:
                 <select
-                  name="itemStatus"
-                  value={editForm.itemStatus}
+                  name="itemstatus"
+                  value={editForm.itemstatus}
                   onChange={handleEditChange}
                 >
-                  <option value="">(No Change)</option>
-                  <option value="available">Available</option>
-                  <option value="onHold">On Hold</option>
-                  <option value="sold">Sold</option>
+                  <option value="Available">Available</option>
+                  <option value="On Hold">On Hold</option>
+                  <option value="Sold">Sold</option>
                 </select>
               </label>
 
@@ -276,7 +275,7 @@ export default function SellerItems({ username, token, refreshTrigger }) {
               <p>Dimensions: {item.dimensions || "Not specified"}</p>
               <p>Size: {item.size || "Not specified"}</p>
               <p>Color: {item.color || "Not specified"}</p>
-              <p>Item Status: {item.itemStatus || "Available"}</p>        
+              <p>Item Status: {item.itemstatus || "Available"}</p>        
               {item.image && (
                 <img
                   src={`${process.env.REACT_APP_API_URL}/uploads/${item.image}`}

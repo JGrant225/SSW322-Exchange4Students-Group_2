@@ -70,6 +70,10 @@ export default function CheckoutPage() {
           headers: { Authorization: `Bearer ${token}` }
         });
       }
+      
+      await axios.delete(`${process.env.REACT_APP_API_URL}/cart/clear`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
 
       alert("Buy requests sent successfully!");
 

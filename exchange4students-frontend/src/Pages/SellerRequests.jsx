@@ -14,41 +14,52 @@ export default function SellerRequests({ username, token }) {
       const res = await axios.get(`${process.env.REACT_APP_API_URL}/buyrequests/seller`, {
         headers: { Authorization: `Bearer ${token}` }
       });
-
-      // Ensure response is an array or fallback to []
       const data = Array.isArray(res.data) ? res.data : [];
-      console.log("[SellerRequests] Fetched requests:", data);
       setRequests(data);
     } catch (err) {
-      console.error("Error fetching requests:", err);
+      console.error("[SellerRequests] Error fetching requests:", err.response?.data || err.message || err);
       setRequests([]);
     }
   };
 
   useEffect(() => {
     fetchRequests();
+    const interval = setInterval(fetchRequests, 5000);
+    return () => clearInterval(interval);
   }, [token]);
 
-  // Update item status (Available, On Hold, Sold)
-  const handleStatusChange = async (itemId, newStatus) => {
+  // Accept a specific buy request
+  const handleAcceptRequest = async (requestId) => {
     try {
-      await axios.put(`${process.env.REACT_APP_API_URL}/items/${itemId}/status`, 
-        { status: newStatus },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-
-      alert(`Item status updated to "${newStatus}"`);
+      await axios.put(`${process.env.REACT_APP_API_URL}/buyrequests/${requestId}/accept`, {}, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      alert("Request accepted. Item is now On Hold.");
       fetchRequests();
     } catch (err) {
-      console.error("Error updating item status:", err);
-      alert("Failed to update item status.");
+      console.error("Error accepting request:", err.response?.data || err.message || err);
+      alert("Failed to accept buy request.");
+    }
+  };
+
+  // Deny a specific buy request
+  const handleDenyRequest = async (requestId) => {
+    try {
+      await axios.put(`${process.env.REACT_APP_API_URL}/buyrequests/${requestId}/status`, {
+        status: "Rejected"
+      }, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      alert("Request denied.");
+      fetchRequests();
+    } catch (err) {
+      console.error("Error denying request:", err.response?.data || err.message || err);
+      alert("Failed to deny buy request.");
     }
   };
 
   // Don't show while viewing checkout
-  if (location.pathname === "/checkout") {
-    return null;
-  }
+  if (location.pathname === "/checkout") return null;
 
   return (
     <div>
@@ -76,7 +87,7 @@ export default function SellerRequests({ username, token }) {
           style={{
             position: "fixed",
             top: "3.5rem",
-            right: "6rem",
+            right: "1rem",
             backgroundColor: "white",
             border: "1px solid #ccc",
             padding: "1rem",
@@ -91,9 +102,9 @@ export default function SellerRequests({ username, token }) {
           {requests.length === 0 ? (
             <p>No requests yet.</p>
           ) : (
-            requests.map((req) => (
+            requests.map((req, index) => (
               <div
-                key={req.id}
+                key={req.id || index}
                 style={{
                   border: "1px solid #ddd",
                   padding: "0.75rem",
@@ -101,18 +112,19 @@ export default function SellerRequests({ username, token }) {
                   borderRadius: "5px",
                 }}
               >
-                <strong>{req.title}</strong>
-                <p>Buyer: {req.buyer_username}</p>
-                <p>Email: {req.contact_email}</p>
-                <p>Phone: {req.contact_phone}</p>
+                <strong>{req.item_title || "Untitled"}</strong>
+                <p>Buyer: {req.buyer_username || "Unknown"}</p>
+                <p>Email: {req.contact_email || "N/A"}</p>
+                <p>Phone: {req.contact_phone || "N/A"}</p>
                 <p>Message: {req.message || "No message"}</p>
-                <p>Status: <strong>{req.itemstatus}</strong></p>
+                <p>Status: <strong>{req.request_status || "Pending"}</strong></p>
 
-                <div style={{ marginTop: "0.5rem", display: "flex", gap: "0.5rem" }}>
-                  <button onClick={() => handleStatusChange(req.item_id, "On Hold")}>On Hold</button>
-                  <button onClick={() => handleStatusChange(req.item_id, "Sold")}>Sold</button>
-                  <button onClick={() => handleStatusChange(req.item_id, "Available")}>Available</button>
-                </div>
+                {req.request_status === "Pending" && (
+                  <div style={{ marginTop: "0.5rem", display: "flex", gap: "0.5rem" }}>
+                    <button onClick={() => handleAcceptRequest(req.id)}>Accept</button>
+                    <button onClick={() => handleDenyRequest(req.id)}>Deny</button>
+                  </div>
+                )}
               </div>
             ))
           )}

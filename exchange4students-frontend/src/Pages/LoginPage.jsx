@@ -51,7 +51,16 @@ export function LoginPage({ onCartUpdate, onRoleChange }) {
       {username && (
         <>
           <p>Logged in as: <strong>{username}</strong></p>
-          <button onClick={handleLogout}>Logout</button>
+          <button onClick={handleLogout} style={{
+          cursor: "pointer",
+          marginRight: "1rem",
+          transition: "all 0.2s ease",
+          padding: "0.5rem 1rem",
+          borderRadius: "4px",
+          border: "none",
+          backgroundColor: "#4caf50",
+          color: "#fff",
+        }}>Logout</button>
         </>
       )}
 
@@ -67,12 +76,23 @@ export function LoginPage({ onCartUpdate, onRoleChange }) {
       >
         <button onClick={() => { setSelectedTab("seller"); onRoleChange("seller"); }} style={{
           cursor: "pointer",
-          padding: "0.5rem 1rem",
           marginRight: "1rem",
+          transition: "all 0.2s ease",
+          padding: "0.5rem 1rem",
+          borderRadius: "4px",
+          border: "none",
+          backgroundColor: "#4caf50",
+          color: "#fff",
         }}>Seller</button>
         <button onClick={() => { setSelectedTab("buyer"); onRoleChange("buyer"); }}style={{
           cursor: "pointer",
+          marginRight: "1rem",
+          transition: "all 0.2s ease",
           padding: "0.5rem 1rem",
+          borderRadius: "4px",
+          border: "none",
+          backgroundColor: "#4caf50",
+          color: "#fff",
         }}>Buyer</button>
       </div>
 

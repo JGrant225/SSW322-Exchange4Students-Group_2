@@ -188,7 +188,7 @@ export function BrowseItems({ onCartUpdate, username, token }) {
                 border: "none",
                 cursor: "pointer",
                 fontSize: "0.8rem",
-                color: "#666"
+                color: "#666",
               }}
             >
               ×

@@ -5,11 +5,12 @@ import { LoginPage } from './Pages/LoginPage';
 import BrowseItems from './Pages/BrowseItems';
 import Cart from './Pages/Cart';
 import CheckoutPage from './Pages/CheckoutPage';
+import SellerRequests from './Pages/SellerRequests';
 import React, { useState } from 'react';
 
 function App() {
-  const [token] = useState(localStorage.getItem("token") || "");
-  const [username] = useState(localStorage.getItem("username") || "");
+  const [token, setToken] = useState(localStorage.getItem("token") || "");
+  const [username, setUsername] = useState(localStorage.getItem("username") || "");
 
   // Track buyer/seller role
   const [userRole, setUserRole] = useState("");
@@ -21,14 +22,29 @@ function App() {
     setCartUpdateTrigger((prev) => prev + 1);
   };
 
+  // Update role and persist username/token on login
+  const handleRoleChange = (role) => {
+    setUserRole(role);
+    setToken(localStorage.getItem("token") || "");
+    setUsername(localStorage.getItem("username") || "");
+  };
+
   return (
     <Router>
-      {/* Only show Cart if role is 'buyer' */}
-      {userRole === "buyer" && (
+      {/* Only show Cart if role is 'buyer' and logged in */}
+      {userRole === "buyer" && token && (
         <Cart
           username={username}
           token={token}
           refreshTrigger={cartUpdateTrigger}
+        />
+      )}
+
+      {/* Only show SellerRequests if role is 'seller' and logged in */}
+      {userRole === "seller" && token && (
+        <SellerRequests
+          username={username}
+          token={token}
         />
       )}
 
@@ -39,7 +55,7 @@ function App() {
           element={
             <LoginPage
               onCartUpdate={handleCartUpdate}
-              onRoleChange={(role) => setUserRole(role)}
+              onRoleChange={handleRoleChange}
             />
           }
         />

@@ -5,7 +5,7 @@ import SellerItems from "./SellerItems";
 import BrowseItems from "./BrowseItems";
 
 // LoginPage handles role selection and renders seller/buyer specific content
-export function LoginPage({ onCartUpdate, onRoleChange }) {
+export function LoginPage({ onCartUpdate, onRoleChange, onLogout }) {
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -16,13 +16,17 @@ export function LoginPage({ onCartUpdate, onRoleChange }) {
 
   // On logout, clear state and storage
   const handleLogout = () => {
-    setUsername("");
-    setToken("");
     localStorage.removeItem("token");
     localStorage.removeItem("username");
     localStorage.removeItem("role");
+    setUsername("");
+    setToken("");
+    onLogout();
     onRoleChange("");
     navigate("/");
+    console.log("App State after logout:", {
+      userRole: "", username: "", token: ""
+    });
   };
 
   // Initialize user and role from login or persistent session

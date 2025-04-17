@@ -23,8 +23,10 @@ router.post("/", verifyToken, upload.single("image"), async (req, res) => {
 
   try {
     const result = await pool.query(
-      "INSERT INTO items (title, description, price, seller_username, image, category, dimensions, size, color, itemstatus) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING *",
-      [title, description, price, seller_username, image, category, dimensions, size, color, 'Available']
+      `INSERT INTO items (title, description, price, seller_username, image, category, dimensions, size, color, itemstatus)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, 'Available')
+       RETURNING *`,
+      [title, description, price, seller_username, image, category, dimensions, size, color]
     );
     res.status(201).json(result.rows[0]);
   } catch (err) {
@@ -39,22 +41,17 @@ router.get("/", async (req, res) => {
   const { category, search } = req.query;
 
   try {
-    // Start with a basic query
     let queryText = "SELECT * FROM items";
     const queryParams = [];
     const conditions = [];
 
-    // Add category filter if provided
     if (category) {
       conditions.push(`category = $${queryParams.length + 1}`);
       queryParams.push(category);
     }
 
-    // Add search terms if provided
     if (search && search.trim()) {
       const searchTerms = search.split(',').map(term => term.trim()).filter(Boolean);
-      console.log("Parsed search terms:", searchTerms);
-
       if (searchTerms.length > 0) {
         const searchConditions = [];
 
@@ -78,12 +75,8 @@ router.get("/", async (req, res) => {
     }
 
     queryText += " ORDER BY created_at DESC";
-    console.log("Final SQL query:", queryText);
-    console.log("Query parameters:", queryParams);
 
     const result = await pool.query(queryText, queryParams);
-    console.log(`Query returned ${result.rows.length} items`);
-
     res.json(result.rows);
   } catch (err) {
     console.error("Error in GET /items:", err);
@@ -149,59 +142,29 @@ router.put("/:id", verifyToken, upload.single("image"), async (req, res) => {
     const values = [];
     let index = 1;
 
-    if (title) {
-      fields.push(`title = $${index++}`);
-      values.push(title);
-    }
-    if (description) {
-      fields.push(`description = $${index++}`);
-      values.push(description);
-    }
-    if (price) {
-      fields.push(`price = $${index++}`);
-      values.push(price);
-    }
-    if (category) {
-      fields.push(`category = $${index++}`);
-      values.push(category);
-    }
-    if (dimensions) {
-      fields.push(`dimensions = $${index++}`);
-      values.push(dimensions);
-    }
-    if (size) {
-      fields.push(`size = $${index++}`);
-      values.push(size);
-    }
-    if (color) {
-      fields.push(`color = $${index++}`);
-      values.push(color);
-    }
-    if (image) {
-      fields.push(`image = $${index++}`);
-      values.push(image);
-    }
-    if (itemstatus) {
-      fields.push(`itemstatus = $${index++}`);
-      values.push(itemstatus);
-    }
+    if (title) fields.push(`title = $${index++}`), values.push(title);
+    if (description) fields.push(`description = $${index++}`), values.push(description);
+    if (price) fields.push(`price = $${index++}`), values.push(price);
+    if (category) fields.push(`category = $${index++}`), values.push(category);
+    if (dimensions) fields.push(`dimensions = $${index++}`), values.push(dimensions);
+    if (size) fields.push(`size = $${index++}`), values.push(size);
+    if (color) fields.push(`color = $${index++}`), values.push(color);
+    if (image) fields.push(`image = $${index++}`), values.push(image);
+    if (itemstatus) fields.push(`itemstatus = $${index++}`), values.push(itemstatus);
 
     if (fields.length === 0) {
       return res.status(400).json({ message: "No fields to update" });
     }
 
-    values.push(itemId);
-    values.push(seller_username);
+    values.push(itemId, seller_username);
 
     const updateQuery = `
       UPDATE items
       SET ${fields.join(", ")}
       WHERE id = $${index++} AND seller_username = $${index}
-      RETURNING *
-    `;
+      RETURNING *`;
 
     const result = await pool.query(updateQuery, values);
-
     res.json(result.rows[0]);
   } catch (err) {
     console.error("Error updating item:", err);
@@ -228,20 +191,38 @@ router.get("/buyrequests", verifyToken, async (req, res) => {
   }
 });
 
-// Update item status (Available, On Hold, Sold) by item ID
+// Update item status and optional accepted_buyer
 router.put("/:id/status", verifyToken, async (req, res) => {
   const itemId = req.params.id;
-  const { status } = req.body;
+  const seller = req.user.username;
+  const { status, accepted_buyer } = req.body;
 
   try {
-    const result = await pool.query(
-      "UPDATE items SET itemstatus = $1 WHERE id = $2 RETURNING *",
-      [status, itemId]
+    const existing = await pool.query(
+      "SELECT * FROM items WHERE id = $1 AND seller_username = $2",
+      [itemId, seller]
     );
 
-    if (result.rows.length === 0) {
-      return res.status(404).json({ message: "Item not found or update failed" });
+    if (existing.rows.length === 0) {
+      return res.status(403).json({ message: "Not authorized or item not found" });
     }
+
+    const fields = ["itemstatus = $1"];
+    const values = [status];
+
+    if (accepted_buyer) {
+      fields.push("accepted_buyer = $2");
+      values.push(accepted_buyer);
+    }
+
+    const queryText = `
+      UPDATE items
+      SET ${fields.join(", ")}
+      WHERE id = $${values.length + 1}
+      RETURNING *`;
+
+    values.push(itemId);
+    const result = await pool.query(queryText, values);
 
     res.json(result.rows[0]);
   } catch (err) {

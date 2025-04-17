@@ -41,7 +41,7 @@ app.use("/cart", cartRoutes);
 
 // Import and mount buy request routes
 const buyRequestRoutes = require("./routes/buyrequests");
-app.use("/buy_requests", buyRequestRoutes);
+app.use("/buyrequests", buyRequestRoutes);
 
 // Serve static files from the React frontend build folder
 app.use(express.static(path.join(__dirname, "build")));

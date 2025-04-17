@@ -118,6 +118,7 @@ This backend server provides RESTful API endpoints for basic functionality such 
       size TEXT,
       color TEXT,
       itemstatus VARCHAR(20) DEFAULT 'Available' CHECK (itemstatus IN ('Available', 'On Hold', 'Sold')),
+      accepted_buyer TEXT,
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     );
 
@@ -156,6 +157,6 @@ This backend server provides RESTful API endpoints for basic functionality such 
       contact_email TEXT NOT NULL,
       contact_phone TEXT NOT NULL,
       message TEXT,
-      request_status VARCHAR(20) DEFAULT 'Pending' CHECK (request_status IN ('Pending', 'Approved', 'Rejected')),
+      request_status VARCHAR(20) DEFAULT 'Pending' CHECK (request_status IN ('Pending', 'Accepted', 'Rejected')),
       requested_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     );

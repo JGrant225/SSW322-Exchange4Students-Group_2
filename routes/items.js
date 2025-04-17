@@ -17,14 +17,16 @@ const upload = multer({ storage });
 
 // Add new item with optional image and category
 router.post("/", verifyToken, upload.single("image"), async (req, res) => {
-  const { title, description, price, category, dimensions, size, color, itemstatus } = req.body;
+  const { title, description, price, category, dimensions, size, color } = req.body;
   const seller_username = req.user.username;
   const image = req.file ? req.file.filename : null;
 
   try {
     const result = await pool.query(
-      "INSERT INTO items (title, description, price, seller_username, image, category, dimensions, size, color, itemstatus) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING *",
-      [title, description, price, seller_username, image, category, dimensions, size, color, itemstatus]
+      `INSERT INTO items (title, description, price, seller_username, image, category, dimensions, size, color, itemstatus)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, 'Available')
+       RETURNING *`,
+      [title, description, price, seller_username, image, category, dimensions, size, color]
     );
     res.status(201).json(result.rows[0]);
   } catch (err) {
@@ -39,29 +41,22 @@ router.get("/", async (req, res) => {
   const { category, search } = req.query;
 
   try {
-    // Start with a basic query
     let queryText = "SELECT * FROM items";
     const queryParams = [];
     const conditions = [];
 
-    // Add category filter if provided
     if (category) {
       conditions.push(`category = $${queryParams.length + 1}`);
       queryParams.push(category);
     }
 
-    // Add search terms if provided
     if (search && search.trim()) {
       const searchTerms = search.split(',').map(term => term.trim()).filter(Boolean);
-      console.log("Parsed search terms:", searchTerms);
-
       if (searchTerms.length > 0) {
-        // Create a combined search condition with OR operators
         const searchConditions = [];
 
         searchTerms.forEach(term => {
           const paramIndex = queryParams.length + 1;
-          // Add size, color, and dimensions to search
           searchConditions.push(`(
             LOWER(title) LIKE $${paramIndex} OR 
             LOWER(description) LIKE $${paramIndex} OR 
@@ -71,27 +66,17 @@ router.get("/", async (req, res) => {
           )`);
           queryParams.push(`%${term.toLowerCase()}%`);
         });
-
-        // Add the combined search condition
         conditions.push(`(${searchConditions.join(' OR ')})`);
       }
     }
 
-    // Add WHERE clause if we have conditions
     if (conditions.length > 0) {
       queryText += " WHERE " + conditions.join(" AND ");
     }
 
-    // Add ordering
     queryText += " ORDER BY created_at DESC";
 
-    console.log("Final SQL query:", queryText);
-    console.log("Query parameters:", queryParams);
-
-    // Execute the query
     const result = await pool.query(queryText, queryParams);
-    console.log(`Query returned ${result.rows.length} items`);
-
     res.json(result.rows);
   } catch (err) {
     console.error("Error in GET /items:", err);
@@ -136,7 +121,7 @@ router.delete("/:id", verifyToken, async (req, res) => {
   }
 });
 
-// Update an item posted by the logged-in seller (including optional new image or category)
+// Update an item posted by the logged-in seller
 router.put("/:id", verifyToken, upload.single("image"), async (req, res) => {
   const itemId = req.params.id;
   const seller_username = req.user.username;
@@ -157,63 +142,92 @@ router.put("/:id", verifyToken, upload.single("image"), async (req, res) => {
     const values = [];
     let index = 1;
 
-    if (title) {
-      fields.push(`title = $${index++}`);
-      values.push(title);
-    }
-    if (description) {
-      fields.push(`description = $${index++}`);
-      values.push(description);
-    }
-    if (price) {
-      fields.push(`price = $${index++}`);
-      values.push(price);
-    }
-    if (category) {
-      fields.push(`category = $${index++}`);
-      values.push(category);
-    }
-    if (dimensions) {
-      fields.push(`dimensions = $${index++}`);
-      values.push(dimensions);
-    }
-    if (size) {
-      fields.push(`size = $${index++}`);
-      values.push(size);
-    }
-    if (color) {
-      fields.push(`color = $${index++}`);
-      values.push(color);
-    }
-    if (image) {
-      fields.push(`image = $${index++}`);
-      values.push(image);
-    }
-    if (itemstatus) {
-      fields.push(`itemstatus = $${index++}`);
-      values.push(itemstatus);
-    }
+    if (title) fields.push(`title = $${index++}`), values.push(title);
+    if (description) fields.push(`description = $${index++}`), values.push(description);
+    if (price) fields.push(`price = $${index++}`), values.push(price);
+    if (category) fields.push(`category = $${index++}`), values.push(category);
+    if (dimensions) fields.push(`dimensions = $${index++}`), values.push(dimensions);
+    if (size) fields.push(`size = $${index++}`), values.push(size);
+    if (color) fields.push(`color = $${index++}`), values.push(color);
+    if (image) fields.push(`image = $${index++}`), values.push(image);
+    if (itemstatus) fields.push(`itemstatus = $${index++}`), values.push(itemstatus);
 
     if (fields.length === 0) {
       return res.status(400).json({ message: "No fields to update" });
     }
 
-    values.push(itemId);
-    values.push(seller_username);
+    values.push(itemId, seller_username);
 
     const updateQuery = `
       UPDATE items
       SET ${fields.join(", ")}
       WHERE id = $${index++} AND seller_username = $${index}
-      RETURNING *
-    `;
+      RETURNING *`;
 
     const result = await pool.query(updateQuery, values);
-
     res.json(result.rows[0]);
   } catch (err) {
     console.error("Error updating item:", err);
     res.status(500).json({ message: "Failed to update item" });
+  }
+});
+
+// Fetch all buy requests for items sold by logged-in seller
+router.get("/buyrequests", verifyToken, async (req, res) => {
+  const seller = req.user.username;
+  try {
+    const result = await pool.query(
+      `SELECT br.*, i.title, i.image
+       FROM buy_requests br
+       JOIN items i ON br.item_id = i.id
+       WHERE i.seller_username = $1
+       ORDER BY br.requested_at DESC`,
+      [seller]
+    );
+    res.json(result.rows);
+  } catch (err) {
+    console.error("Error fetching buy requests:", err);
+    res.status(500).json({ message: "Failed to fetch buy requests" });
+  }
+});
+
+// Update item status and optional accepted_buyer
+router.put("/:id/status", verifyToken, async (req, res) => {
+  const itemId = req.params.id;
+  const seller = req.user.username;
+  const { status, accepted_buyer } = req.body;
+
+  try {
+    const existing = await pool.query(
+      "SELECT * FROM items WHERE id = $1 AND seller_username = $2",
+      [itemId, seller]
+    );
+
+    if (existing.rows.length === 0) {
+      return res.status(403).json({ message: "Not authorized or item not found" });
+    }
+
+    const fields = ["itemstatus = $1"];
+    const values = [status];
+
+    if (accepted_buyer) {
+      fields.push("accepted_buyer = $2");
+      values.push(accepted_buyer);
+    }
+
+    const queryText = `
+      UPDATE items
+      SET ${fields.join(", ")}
+      WHERE id = $${values.length + 1}
+      RETURNING *`;
+
+    values.push(itemId);
+    const result = await pool.query(queryText, values);
+
+    res.json(result.rows[0]);
+  } catch (err) {
+    console.error("Error updating item status:", err);
+    res.status(500).json({ message: "Failed to update item status" });
   }
 });
 

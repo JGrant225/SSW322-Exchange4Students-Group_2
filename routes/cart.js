@@ -58,6 +58,18 @@ router.get("/", verifyToken, async (req, res) => {
   }
 });
 
+// Clear all cart items for the logged-in user
+router.delete("/clear", verifyToken, async (req, res) => {
+  const buyer_username = req.user.username;
+  try {
+    await pool.query("DELETE FROM cart_items WHERE buyer_username = $1", [buyer_username]);
+    res.json({ message: "Cart cleared" });
+  } catch (err) {
+    console.error("Error clearing cart:", err);
+    res.status(500).json({ message: "Failed to clear cart" });
+  }
+});
+
 // Remove item from cart
 router.delete("/:itemId", verifyToken, async (req, res) => {
   const buyer_username = req.user.username;
@@ -96,7 +108,7 @@ router.post("/checkout", verifyToken, async (req, res) => {
         return res.status(400).json({ message: "Cart is empty" });
       }
   
-      // alculate total
+      // Calculate total
       const total = cartItems.reduce((sum, item) => sum + parseFloat(item.price), 0);
   
       // Insert new order

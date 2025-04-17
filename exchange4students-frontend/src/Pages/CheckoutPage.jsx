@@ -6,6 +6,7 @@ import axios from "axios";
 export default function CheckoutPage() {
   const navigate = useNavigate();
   const token = localStorage.getItem("token");
+  const username = localStorage.getItem("username");
 
   // Store cart items and total amount
   const [cartItems, setCartItems] = useState([]);
@@ -45,15 +46,13 @@ export default function CheckoutPage() {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  // Confirm checkout — validates input and processes final order
+  // Confirm checkout — validates input and processes buy requests
   const handleConfirmCheckout = async () => {
-    // Validate required fields
     if (!form.fullName || !form.email || !form.phone) {
       alert("Please fill out your full name, email, and phone number.");
       return;
     }
 
-    // Basic phone number pattern check
     const phoneRegex = /^[0-9\-\+\s\(\)]+$/;
     if (!phoneRegex.test(form.phone)) {
       alert("Please enter a valid phone number.");
@@ -61,25 +60,31 @@ export default function CheckoutPage() {
     }
 
     try {
-      await axios.post(`${process.env.REACT_APP_API_URL}/cart/checkout`, {}, {
+      for (const item of cartItems) {
+        await axios.post(`${process.env.REACT_APP_API_URL}/buy_requests`, {
+          item_id: item.id,
+          contact_email: form.email,
+          contact_phone: form.phone,
+          message: form.message || "",
+        }, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+      }
+      
+      await axios.delete(`${process.env.REACT_APP_API_URL}/cart/clear`, {
         headers: { Authorization: `Bearer ${token}` }
       });
 
-      alert("Buy request sent successfully!");
+      alert("Buy requests sent successfully!");
 
       // Clear local state
       setCartItems([]);
       setTotal(0);
 
-      // Navigate back to LoginPage with credentials (stay logged in)
+      // Redirect to login page to refresh state
       navigate("/LoginPage", {
-        state: {
-          username: localStorage.getItem("username"),
-          token: token
-        }
+        state: { username, token }
       });
-
-      // Trigger cart refresh UI
       window.location.reload();
     } catch (err) {
       console.error("Checkout error:", err);
@@ -90,10 +95,7 @@ export default function CheckoutPage() {
   // Navigate user back to the dashboard (LoginPage)
   const handleBackToHome = () => {
     navigate("/LoginPage", {
-      state: {
-        username: localStorage.getItem("username"),
-        token: token
-      }
+      state: { username, token }
     });
   };
 

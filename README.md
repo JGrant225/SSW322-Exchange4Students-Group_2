@@ -15,7 +15,7 @@ Exchange4Students enables students to:
 |------------------|------------------|
 | Edmund Yuen      | Backend architecture, Seller backend setup, HTTPS setup, user authentication (JWT), PostgreSQL integration |
 | Jacob Gelman     | Update use case diagrams
-| James Grant      | Frontend setup, .jsx Page Routing, Buyer Page Integration & Database connection 
+| James Grant      | Frontend setup, .jsx Page Routing, Buyer Page Integration & Database connection, Implemented Keyword Search functionality, Implemented "Browse by" functionality, UI style updates
 | Justin Phan      | Displaying items on buyer page
 
 ## Functions Implemented
@@ -36,6 +36,7 @@ Exchange4Students enables students to:
 - **OpenSSL** – Local HTTPS certificate generation
 - **React.js** - Frontend library to develop UI
 - **Multer** - Middleware for Node to handle form data (File Upload)
+- **CSS** - UI styling
 
 ## Installation
 1. Open a terminal
@@ -56,7 +57,7 @@ This backend server provides RESTful API endpoints for basic functionality such 
 ## Team Responsibilities
 
 - **Edmund** – Set up backend architecture, implemented HTTPS server, User registration logic with PostgreSQL, JWT-based login flow, and environment configuration, started troubleshooting Global Access, Post Item Functionality, Edit/Delete Item Functionality
-- **James** - Set up frontend web display with seperate pages, components, and assets integrated through Routing, Integrated the initial Buyer page and connected item display through PostgreSQL database
+- **James** - Set up frontend web display with seperate pages, components, and assets integrated through Routing, Integrated the initial Buyer page and connected item display through PostgreSQL database, Keyword Search function, Browse by size, color, and dimensions, Updated UI for Login page and post-Login
 - **Justin** - Displaying items on buyer page
 - **Jacob** - Update use case diagrams
 
@@ -107,23 +108,24 @@ This backend server provides RESTful API endpoints for basic functionality such 
       password TEXT NOT NULL
     );
 
-    -- Items table --
+    -- Items Table --
     CREATE TABLE items (
       id SERIAL PRIMARY KEY,
       title VARCHAR(255) NOT NULL,
       description TEXT,
       price NUMERIC(10,2) NOT NULL,
       seller_username VARCHAR(255),
+      image TEXT,
       category TEXT,
       dimensions TEXT,
-      image TEXT,
       size TEXT,
       color TEXT,
       itemstatus VARCHAR(20) DEFAULT 'Available' CHECK (itemstatus IN ('Available', 'On Hold', 'Sold')),
+      accepted_buyer TEXT,
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     );
-    
-    -- Cart Items --
+
+    -- Cart Items Table --
     CREATE TABLE cart_items (
       id SERIAL PRIMARY KEY,
       buyer_username TEXT NOT NULL,
@@ -132,8 +134,8 @@ This backend server provides RESTful API endpoints for basic functionality such 
       added_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
       UNIQUE (buyer_username, item_id)
     );
-    
-    -- Create Orders Table --
+
+    -- Orders Table --
     CREATE TABLE orders (
       id SERIAL PRIMARY KEY,
       buyer_username TEXT NOT NULL,
@@ -141,11 +143,23 @@ This backend server provides RESTful API endpoints for basic functionality such 
       placed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     );
 
-    -- Create Order Items Table --
+    -- Order Items Table --
     CREATE TABLE order_items (
       id SERIAL PRIMARY KEY,
       order_id INTEGER REFERENCES orders(id) ON DELETE CASCADE,
       item_id INTEGER REFERENCES items(id),
       quantity INTEGER,
       price NUMERIC(10,2)
+    );
+
+    -- Buy Requests Table --
+    CREATE TABLE buy_requests (
+      id SERIAL PRIMARY KEY,
+      buyer_username TEXT NOT NULL,
+      item_id INTEGER REFERENCES items(id) ON DELETE CASCADE,
+      contact_email TEXT NOT NULL,
+      contact_phone TEXT NOT NULL,
+      message TEXT,
+      request_status VARCHAR(20) DEFAULT 'Pending' CHECK (request_status IN ('Pending', 'Accepted', 'Rejected')),
+      requested_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     );

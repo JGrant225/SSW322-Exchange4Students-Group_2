@@ -175,7 +175,7 @@ export default function SellerItems({ username, token, refreshTrigger }) {
       });
 
       const sellerItems = res.data.filter(
-        (item) => item.seller_username === username
+        (item) => item.seller_username?.toLowerCase() === username.toLowerCase()
       );
 
       setItems(sellerItems);

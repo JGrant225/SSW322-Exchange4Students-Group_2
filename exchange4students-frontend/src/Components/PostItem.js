@@ -117,14 +117,10 @@ const PostItem = ({ username, token, onItemPosted }) => {
   };
 
   return (
-    <div>
+    <><h2 style={{textAlign: "center"}}>Post an Item</h2><div>
       {/* If user is logged in, show form */}
       {isLoggedIn ? (
         <>
-          <p>Logged in as: <strong>{username}</strong></p>
-          <button onClick={handleLogout}>Logout</button>
-          <h2>Post an Item</h2>
-
           {/* Form for submitting a new item */}
           <form onSubmit={handleSubmit} encType="multipart/form-data">
             {/* Title input */}
@@ -132,16 +128,30 @@ const PostItem = ({ username, token, onItemPosted }) => {
               name="title"
               placeholder="Item Title"
               value={form.title}
-              onChange={handleChange}
-            /><br />
+              onChange={handleChange} 
+              style={{
+                padding: "0.5rem 0.75rem",
+                borderRadius: "6px",
+                border: "1px solid #ccc",
+                fontSize: "1rem",
+                color: "#2c3e50",
+                margin: "0.5rem"              
+              }}/><br />
 
             {/* Description input */}
             <textarea
               name="description"
               placeholder="Item Description"
               value={form.description}
-              onChange={handleChange}
-            /><br />
+              onChange={handleChange} 
+              style={{
+                padding: "0.5rem 0.75rem",
+                borderRadius: "6px",
+                border: "1px solid #ccc",
+                fontSize: "1rem",
+                color: "#2c3e50",
+                margin: "0.5rem"              
+              }}/><br />
 
             {/* Price input */}
             <input
@@ -149,8 +159,15 @@ const PostItem = ({ username, token, onItemPosted }) => {
               type="number"
               placeholder="Price"
               value={form.price}
-              onChange={handleChange}
-            /><br />
+              onChange={handleChange} 
+              style={{
+                padding: "0.5rem 0.75rem",
+                borderRadius: "6px",
+                border: "1px solid #ccc",
+                fontSize: "1rem",
+                color: "#2c3e50",
+                margin: "0.5rem"              
+              }}/><br />
 
             {/* Category dropdown */}
             <select
@@ -171,8 +188,14 @@ const PostItem = ({ username, token, onItemPosted }) => {
               name="dimensions"
               placeholder="Dimensions (e.g. 10x20)"
               value={form.dimensions}
-              onChange={handleChange}
-            /><br />
+              onChange={handleChange}               style={{
+                padding: "0.5rem 0.75rem",
+                borderRadius: "6px",
+                border: "1px solid #ccc",
+                fontSize: "1rem",
+                color: "#2c3e50",
+                margin: "0.5rem"              
+              }}/><br />
 
             {/* Size dropdown */}
             <select
@@ -194,8 +217,15 @@ const PostItem = ({ username, token, onItemPosted }) => {
               name="color"
               placeholder="Color (e.g. Red)"
               value={form.color}
-              onChange={handleChange}
-            /><br />
+              onChange={handleChange}               
+              style={{
+                padding: "0.5rem 0.75rem",
+                borderRadius: "6px",
+                border: "1px solid #ccc",
+                fontSize: "1rem",
+                color: "#2c3e50",
+                margin: "0.5rem"              
+              }}/><br />
 
             {/* File upload */}
             <label>
@@ -204,8 +234,7 @@ const PostItem = ({ username, token, onItemPosted }) => {
                 type="file"
                 accept="image/*"
                 onChange={handleImageChange}
-                style={{ display: "block", marginTop: "0.5rem" }}
-              />
+                style={{ display: "block", marginTop: "0.5rem" }} />
             </label>
 
             {/* Thumbnail preview */}
@@ -220,8 +249,7 @@ const PostItem = ({ username, token, onItemPosted }) => {
                       maxWidth: "200px",
                       border: "1px solid #ccc",
                       marginTop: "0.5rem"
-                    }}
-                  />
+                    }} />
                 </div>
               </div>
             )}
@@ -239,7 +267,69 @@ const PostItem = ({ username, token, onItemPosted }) => {
 
       {/* Show server feedback message */}
       {message && <p>{message}</p>}
-    </div>
+      {/* CSS animations */}
+      <style>
+        {`
+          form {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            max-width: 500px;
+            margin: 2rem auto;
+            padding: 1.5rem;
+            background-color: #f7f9fc;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+          }
+
+          form input[type="text"],
+          form input[type="number"],
+          form input[type="file"],
+          form textarea,
+          form select {
+            padding: 0.5rem;
+            font-size: 1rem;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            background-color: #fff;
+            transition: border 0.2s ease-in-out;
+            margin: 0.5rem ;
+          }
+
+          form input[type="file"] {
+            padding: 0.3rem;
+          }
+
+          form input:focus,
+          form textarea:focus,
+          form select:focus {
+            outline: none;
+            border-color: #5c9ded;
+          }
+
+          form label {
+            font-weight: 500;
+            margin-bottom: 0.25rem;
+            display: block;
+          }
+
+          form button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 0.6rem 1rem;
+            font-size: 1rem;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+          }
+
+          form button:hover {
+            background-color: #3e9140;
+          }
+        `}
+      </style>
+    </div></>
   );
 };
 

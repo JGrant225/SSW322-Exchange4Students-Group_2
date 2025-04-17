@@ -22,6 +22,47 @@ export default function SellerItems({ username, token, refreshTrigger }) {
     itemstatus: ""
   });
 
+  const inputStyle = {
+    padding: "0.5rem",
+    borderRadius: "4px",
+    border: "1px solid #ccc",
+    width: "100%",
+    boxSizing: "border-box",
+  };
+  
+  const textareaStyle = {
+    ...inputStyle,
+    minHeight: "80px",
+  };
+  
+  const selectStyle = {
+    ...inputStyle,
+  };
+  
+  const buttonStyle = {
+    backgroundColor: "#4CAF50",
+    color: "white",
+    padding: "0.5rem 1rem",
+    border: "none",
+    borderRadius: "4px",
+    cursor: "pointer",
+  };
+  
+  const cancelButtonStyle = {
+    ...buttonStyle,
+    backgroundColor: "#777",
+  };
+  
+  const deleteButtonStyle = {
+    ...buttonStyle,
+    backgroundColor: "#e53935",
+  };
+  
+  const metaStyle = {
+    margin: "0.25rem 0",
+    color: "#555",
+  };
+
   // Fetch seller's items whenever dependencies change
   useEffect(() => {
     const fetchItems = async () => {
@@ -144,48 +185,96 @@ export default function SellerItems({ username, token, refreshTrigger }) {
     }
   };
 
+  const styles = {
+    subtitle: {
+      fontWeight: "600",
+      color: "#333",
+      marginBottom: "1rem",
+    },
+    results: {
+      display: "grid",
+      gridTemplateColumns: "repeat(auto-fill, minmax(250px, 1fr))",
+      gap: "1rem",
+    },
+    card: {
+      border: "1px solid #ddd",
+      padding: "1rem",
+      borderRadius: "8px",
+      backgroundColor: "#fff",
+      boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
+    },
+    input: {
+      padding: "0.5rem",
+      borderRadius: "4px",
+      border: "1px solid #ccc",
+      width: "100%",
+      boxSizing: "border-box",
+    },
+    button: {
+      padding: "0.5rem 1rem",
+      borderRadius: "4px",
+      border: "none",
+      color: "#fff",
+      cursor: "pointer",
+    },
+    image: {
+      maxWidth: "100%",
+      height: "auto",
+      marginTop: "0.5rem",
+    },
+  };  
+
   return (
-    <div>
-      <h2>Your Posted Items</h2>
+    <div style={{ marginTop: "2rem" }}>
+    <h2 style={{ ...styles.subtitle, fontSize: "1.5rem" }}>Your Posted Items</h2>
 
-      {items.length === 0 && <p>You have not posted any items yet.</p>}
+    {items.length === 0 && (
+      <p style={{ textAlign: "center", color: "#6c757d" }}>
+        You have not posted any items yet.
+      </p>
+    )}
 
+    <div style={styles.results}>
       {items.map((item) => (
-        <div
-          key={item.id}
-          style={{
-            border: "1px solid gray",
-            padding: "1rem",
-            marginBottom: "1rem"
-          }}
-        >
+        <div key={item.id} style={styles.card} className="fade-in">
           {editingItemId === item.id ? (
-            // Editing form
-            <form onSubmit={handleEditSubmit} encType="multipart/form-data">
+            <form
+              onSubmit={handleEditSubmit}
+              encType="multipart/form-data"
+              style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}
+            >
               <input
                 name="title"
                 value={editForm.title}
                 onChange={handleEditChange}
-              /><br />
+                placeholder="Title"
+                style={{
+                  padding: "20px",
+                  backgroundColor: "yellow",
+                  fontSize: "1.5rem"}}
+              />
               <textarea
                 name="description"
                 value={editForm.description}
                 onChange={handleEditChange}
-              /><br />
+                placeholder="Description"
+                style={{ ...styles.input, minHeight: "80px" }}
+              />
               <input
                 name="price"
                 type="number"
                 value={editForm.price}
                 onChange={handleEditChange}
-              /><br />
-
-              {/* Category selection dropdown */}
+                placeholder="Price"
+                style={styles.input}
+              />
               <label>
                 Category:
                 <select
                   name="category"
                   value={editForm.category}
                   onChange={handleEditChange}
+                  style={styles.input}
                 >
                   <option value="">(No Change)</option>
                   <option value="Sports">Sports</option>
@@ -195,21 +284,22 @@ export default function SellerItems({ username, token, refreshTrigger }) {
                   <option value="Misc">Misc</option>
                 </select>
               </label>
-              <br />
 
-              {/* Additional fields for new attributes */}
               <input
                 name="dimensions"
                 value={editForm.dimensions}
                 onChange={handleEditChange}
                 placeholder="Dimensions (e.g. 10x20)"
-              /><br />
+                style={styles.input}
+              />
+
               <label>
                 Size:
                 <select
                   name="size"
                   value={editForm.size}
                   onChange={handleEditChange}
+                  style={styles.input}
                 >
                   <option value="">(No Change)</option>
                   <option value="XS">XS</option>
@@ -220,27 +310,29 @@ export default function SellerItems({ username, token, refreshTrigger }) {
                   <option value="XXL">XXL</option>
                 </select>
               </label>
-              <br />
+
               <input
                 name="color"
                 value={editForm.color}
                 onChange={handleEditChange}
                 placeholder="Color (e.g. Red)"
-              /><br />
+                style={styles.input}
+              />
 
               <input
                 type="file"
                 accept="image/*"
                 onChange={handleImageChange}
-              /><br />
+                style={styles.input}
+              />
 
-              {/* Item Status */}
               <label>
                 Item Status:
                 <select
                   name="itemstatus"
                   value={editForm.itemstatus}
                   onChange={handleEditChange}
+                  style={styles.input}
                 >
                   <option value="Available">Available</option>
                   <option value="On Hold">On Hold</option>
@@ -248,48 +340,133 @@ export default function SellerItems({ username, token, refreshTrigger }) {
                 </select>
               </label>
 
-              {/* Image preview if a new image is selected */}
               {editForm.image && (
-                <div style={{ marginTop: "0.5rem" }}>
+                <div>
                   <strong>New image:</strong>
                   <img
                     src={URL.createObjectURL(editForm.image)}
-                    alt="New Preview"
-                    style={{ width: "150px", marginTop: "0.5rem" }}
+                    alt="Preview"
+                    style={styles.image}
                   />
                 </div>
               )}
-              <br />
-              <button type="submit">Save</button>
-              <button type="button" onClick={() => setEditingItemId(null)}>
-                Cancel
-              </button>
+
+              <div style={{ display: "flex", gap: "0.5rem", marginTop: "0.5rem" }}>
+                <button type="submit" style={{ ...styles.button, backgroundColor: "#4CAF50" }}>
+                  Save
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setEditingItemId(null)}
+                  style={{ ...styles.button, backgroundColor: "#777" }}
+                >
+                  Cancel
+                </button>
+              </div>  
             </form>
           ) : (
-            // Read-only view
             <>
-              <h3>{item.title}</h3>
+              <h3 style={{ marginBottom: "0.5rem" }}>{item.title}</h3>
               <p>{item.description}</p>
-              <p>Price: ${item.price}</p>
-              <p>Category: {item.category || "N/A"}</p>
-              <p>Dimensions: {item.dimensions || "Not specified"}</p>
-              <p>Size: {item.size || "Not specified"}</p>
-              <p>Color: {item.color || "Not specified"}</p>
-              <p>Item Status: {item.itemstatus || "Available"}</p>        
+              <p><strong>Price:</strong> ${item.price}</p>
+              <p><strong>Category:</strong> {item.category || "N/A"}</p>
+              <p><strong>Dimensions:</strong> {item.dimensions || "Not specified"}</p>
+              <p><strong>Size:</strong> {item.size || "Not specified"}</p>
+              <p><strong>Color:</strong> {item.color || "Not specified"}</p>
+              <p><strong>Item Status:</strong> {item.itemstatus || "Available"}</p>
+
               {item.image && (
                 <img
                   src={`${process.env.REACT_APP_API_URL}/uploads/${item.image}`}
                   alt={item.title}
-                  style={{ width: "150px", height: "auto" }}
+                  style={styles.image}
                 />
               )}
-              <br />
-              <button onClick={() => handleEditClick(item)}>Edit</button>
-              <button onClick={() => handleDelete(item.id)}>Delete</button>
+
+              <div style={{ display: "flex", gap: "0.5rem", marginTop: "0.75rem" }}>
+                <button
+                  onClick={() => handleEditClick(item)}
+                  style={{ ...styles.button, backgroundColor: "#007bff" }}
+                >
+                  Edit
+                </button>
+                <button
+                  onClick={() => handleDelete(item.id)}
+                  style={{ ...styles.button, backgroundColor: "#f44336" }}
+                >
+                  Delete
+                </button>
+              </div>
             </>
           )}
         </div>
       ))}
     </div>
+    {/* CSS animations */}
+    <style>
+      {`
+        .fade-in {
+          opacity: 0;
+          transform: translateY(10px);
+          animation: fadeInUp 0.4s ease-out forwards;
+        }
+
+        @keyframes fadeInUp {
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+
+        button {
+          transition: all 0.2s ease;
+          padding: 0.5rem 1rem;
+          border-radius: 4px;
+          border: none;
+          background-color: #4caf50;
+          color: #fff;
+          cursor: pointer;
+        }
+
+        .save {
+          background-color: #4caf50;
+        }
+        .save:hover {
+          background-color: #388e3c;
+        }
+
+        .cancel {
+          background-color: #777;
+        }
+        .cancel:hover {
+          background-color: #555;
+        }
+
+        .edit {
+          background-color: #007bff;
+        }
+        .edit:hover {
+          background-color: #0056b3;
+        }
+
+        .delete {
+          background-color: #f44336;
+        }
+        .delete:hover {
+          background-color: #d32f2f;
+        }
+
+        button:hover {
+          filter: brightness(90%);
+          box-shadow: 0 3px 6px rgba(0, 0, 0, 0.15);
+          transform: scale(1.02);
+        }
+
+        button:active {
+          transform: scale(0.96);
+        }
+      `}
+    </style>
+  </div>
   );
 }

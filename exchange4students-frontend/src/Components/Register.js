@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import axios from "axios";
+import "./Register.css";
 
 // Register component handles user registration form
 const Register = () => {
@@ -41,7 +42,7 @@ const handleSubmit = async (e) => {
 };
 
   return (
-    <div>
+    <div className="register-container">
       <h2>Register</h2>
       <form onSubmit={handleSubmit}>
         {/* Input for username */}

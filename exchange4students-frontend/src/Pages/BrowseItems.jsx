@@ -188,7 +188,7 @@ export function BrowseItems({ onCartUpdate, username, token }) {
                 border: "none",
                 cursor: "pointer",
                 fontSize: "0.8rem",
-                color: "#666"
+                color: "#666",
               }}
             >
               ×
@@ -231,20 +231,20 @@ export function BrowseItems({ onCartUpdate, username, token }) {
   };
 
   return (
-    <div style={{ padding: "2rem" }}>
-      <h1>Welcome to Exchange4Students Marketplace</h1>
-      <h2>Select a category to browse</h2>
+    <div style={styles.container}>
+      <h1 style={styles.title}>Welcome to the Marketplace</h1>
+      <h2 style={styles.subtitle}>Select a category to browse</h2>
 
       {/* Category buttons */}
-      <div style={{ marginBottom: "1rem" }}>
+      <div style={styles.buttonGroup}>
         {["Sports", "Music", "Technology", "Clothes", "Misc"].map((category) => (
           <button
             key={category}
             onClick={() => handleCategoryClick(category)}
             style={{
-              marginRight: "0.5rem",
-              padding: "0.5rem 1rem",
-              backgroundColor: selectedCategory === category ? "#ccc" : "#eee",
+              ...styles.categoryButton,
+              backgroundColor: selectedCategory === category ? "#007bff" : "#f0f0f0",
+              color: selectedCategory === category ? "#fff" : "#333",
             }}
           >
             {category}
@@ -253,117 +253,88 @@ export function BrowseItems({ onCartUpdate, username, token }) {
       </div>
 
       {/* Search Bar */}
-      <div style={{ marginBottom: "0.5rem" }}>
+      <div style={styles.searchContainer}>
         <input
           type="text"
           placeholder="Search..."
           value={searchTerm}
           onChange={handleSearch}
-          style={{ padding: "0.5rem", width: "300px", borderRadius: "4px", border: "1px solid #ccc" }}
+          style={styles.input}
         />
-        <button 
-          onClick={() => {
-            fetchItems(selectedCategory, searchTerm);
-          }}
-          style={{
-            marginLeft: "0.5rem",
-            padding: "0.5rem 1rem",
-            backgroundColor: "#4CAF50",
-            color: "white",
-            border: "none",
-            borderRadius: "4px",
-            cursor: "pointer"
-          }}
+        <button
+          onClick={() => fetchItems(selectedCategory, searchTerm)}
+          style={{ ...styles.button, backgroundColor: "#4CAF50" }}
         >
           Search
         </button>
       </div>
 
-      {/* Additional filter fields */}
-      <div style={{ marginBottom: "1rem", display: "flex", flexWrap: "wrap", gap: "0.5rem", alignItems: "center" }}>
+      {/* Filters */}
+      <div style={styles.filters}>
         <div>
-          <label htmlFor="sizeFilter" style={{ fontSize: "0.9rem", marginRight: "0.25rem" }}>Size:</label>
+          <label htmlFor="sizeFilter" style={styles.label}>Size:</label>
           <select
             id="sizeFilter"
             value={sizeFilter}
             onChange={(e) => setSizeFilter(e.target.value)}
-            style={{ padding: "0.5rem", borderRadius: "4px", border: "1px solid #ccc" }}
+            style={styles.input}
           >
             <option value="">Any Size</option>
-            <option value="XS">XS</option>
-            <option value="S">S</option>
-            <option value="M">M</option>
-            <option value="L">L</option>
-            <option value="XL">XL</option>
-            <option value="XXL">XXL</option>
+            {["XS", "S", "M", "L", "XL", "XXL"].map(size => (
+              <option key={size} value={size}>{size}</option>
+            ))}
           </select>
         </div>
-        
+
         <div>
-          <label htmlFor="colorFilter" style={{ fontSize: "0.9rem", marginRight: "0.25rem" }}>Color:</label>
+          <label htmlFor="colorFilter" style={styles.label}>Color:</label>
           <input
             type="text"
             id="colorFilter"
             placeholder="e.g. Red"
             value={colorFilter}
             onChange={(e) => setColorFilter(e.target.value)}
-            style={{ padding: "0.5rem", width: "100px", borderRadius: "4px", border: "1px solid #ccc" }}
+            style={{ ...styles.input, width: "100px" }}
           />
         </div>
-        
+
         <div>
-          <label htmlFor="dimensionsFilter" style={{ fontSize: "0.9rem", marginRight: "0.25rem" }}>Dimensions:</label>
+          <label htmlFor="dimensionsFilter" style={styles.label}>Dimensions:</label>
           <input
             type="text"
             id="dimensionsFilter"
             placeholder="e.g. 10x20"
             value={dimensionsFilter}
             onChange={(e) => setDimensionsFilter(e.target.value)}
-            style={{ padding: "0.5rem", width: "100px", borderRadius: "4px", border: "1px solid #ccc" }}
+            style={{ ...styles.input, width: "100px" }}
           />
         </div>
-        
-        <button 
-          onClick={() => {
-            fetchItems(selectedCategory, searchTerm);
-          }}
-          style={{
-            padding: "0.5rem 1rem",
-            backgroundColor: "#4CAF50",
-            color: "white",
-            border: "none",
-            borderRadius: "4px",
-            cursor: "pointer"
-          }}
+
+        <button
+          onClick={() => fetchItems(selectedCategory, searchTerm)}
+          style={{ ...styles.button, backgroundColor: "#4CAF50" }}
         >
           Apply Filters
         </button>
-        
-        <button 
+
+        <button
           onClick={() => {
             setSizeFilter('');
             setColorFilter('');
             setDimensionsFilter('');
             fetchItems(selectedCategory, searchTerm);
           }}
-          style={{
-            padding: "0.5rem 1rem",
-            backgroundColor: "#f44336",
-            color: "white",
-            border: "none",
-            borderRadius: "4px",
-            cursor: "pointer"
-          }}
+          style={{ ...styles.button, backgroundColor: "#f44336" }}
         >
           Clear Filters
         </button>
       </div>
 
-      {/* Display search tags */}
+      {/* Tags */}
       {renderSearchTags()}
 
-      {/* Display loading, errors, or items */}
-      <div className="items">
+      {/* Results */}
+      <div style={styles.results}>
         {loading && <p>Loading items...</p>}
         {error && <p style={{ color: "red" }}>{error}</p>}
         {!loading && !error && selectedCategory && items.length === 0 && (
@@ -371,24 +342,12 @@ export function BrowseItems({ onCartUpdate, username, token }) {
         )}
 
         {items.map((item) => (
-          <div
-            key={item.id}
-            style={{
-              border: "1px solid gray",
-              padding: "1rem",
-              marginBottom: "1rem",
-              maxWidth: "500px",
-              borderRadius: "4px",
-              boxShadow: "0 2px 4px rgba(0,0,0,0.1)"
-            }}
-          >
+          <div key={item.id} style={styles.card} className="fade-in">
             <h3>{item.title}</h3>
             <p>{item.description}</p>
             <p><strong>Price:</strong> ${item.price}</p>
             <p><strong>Seller:</strong> {item.seller_username}</p>
             <p><strong>Category:</strong> {item.category || "None"}</p>
-
-            {/* Always show these fields even if empty/null */}
             <p><strong>Dimensions:</strong> {item.dimensions || "Not specified"}</p>
             <p><strong>Size:</strong> {item.size && item.size !== 'N/A' ? item.size : "Not applicable"}</p>
             <p><strong>Color:</strong> {item.color || "Not specified"}</p>
@@ -398,20 +357,12 @@ export function BrowseItems({ onCartUpdate, username, token }) {
               <img
                 src={`${process.env.REACT_APP_API_URL}/uploads/${item.image}`}
                 alt={item.title}
-                style={{ width: "150px", height: "auto", marginTop: "0.5rem", borderRadius: "4px" }}
+                style={styles.image}
               />
             )}
 
             <button
-              style={{ 
-                marginTop: "0.5rem", 
-                backgroundColor: "#007bff", 
-                color: "white", 
-                border: "none", 
-                padding: "0.5rem 1rem", 
-                borderRadius: "4px",
-                cursor: "pointer"
-              }}
+              style={{ ...styles.button, backgroundColor: "#007bff", marginTop: "0.5rem" }}
               onClick={() => handleAddToCart(item.id)}
             >
               Add to Cart
@@ -419,8 +370,140 @@ export function BrowseItems({ onCartUpdate, username, token }) {
           </div>
         ))}
       </div>
+
+      {/* CSS animations */}
+      <style>
+        {`
+          .fade-in {
+            opacity: 0;
+            transform: translateY(10px);
+            animation: fadeInUp 0.4s ease-out forwards;
+          }
+
+          @keyframes fadeInUp {
+            to {
+              opacity: 1;
+              transform: translateY(0);
+            }
+          }
+
+          button {
+            transition: all 0.2s ease;
+          }
+
+          button:hover {
+            filter: brightness(90%);
+            box-shadow: 0 3px 6px rgba(0,0,0,0.15);
+            transform: scale(1.02);
+          }
+
+          button:active {
+            transform: scale(0.96);
+          }
+        `}
+      </style>
     </div>
   );
 }
+
+const styles = {
+  container: {
+    padding: "2rem",
+    maxWidth: "1100px",
+    margin: "auto",
+    fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
+    backgroundColor: "#f8f9fa",
+    minHeight: "100vh",
+    color: "#2c3e50"
+  },
+  title: {
+    color: "#2c3e50",
+    fontSize: "2.5rem",
+    fontWeight: "700",
+    marginBottom: "0.25rem"
+  },
+  subtitle: {
+    color: "#6c757d",
+    fontSize: "1.25rem",
+    fontWeight: "500",
+    marginBottom: "1.5rem"
+  },
+  buttonGroup: {
+    marginBottom: "1rem",
+    display: "flex",
+    flexWrap: "wrap",
+    gap: "0.5rem"
+  },
+  categoryButton: {
+    padding: "0.5rem 1rem",
+    borderRadius: "6px",
+    border: "none",
+    backgroundColor: "#e0e0e0",
+    color: "#2c3e50",
+    fontWeight: "500",
+    cursor: "pointer"
+  },
+  searchContainer: {
+    marginBottom: "1.5rem",
+    display: "flex",
+    flexWrap: "wrap",
+    gap: "0.75rem",
+    alignItems: "center"
+  },
+  input: {
+    padding: "0.5rem 0.75rem",
+    borderRadius: "6px",
+    border: "1px solid #ccc",
+    fontSize: "1rem",
+    color: "#2c3e50"
+  },
+  button: {
+    padding: "0.5rem 1rem",
+    color: "white",
+    border: "none",
+    borderRadius: "6px",
+    fontWeight: "500",
+    cursor: "pointer",
+    transition: "all 0.2s ease"
+  },
+  filters: {
+    marginBottom: "1.5rem",
+    display: "flex",
+    flexWrap: "wrap",
+    gap: "0.75rem",
+    alignItems: "center"
+  },
+  label: {
+    fontSize: "0.9rem",
+    marginRight: "0.25rem",
+    fontWeight: "500",
+    color: "#2c3e50"
+  },
+  results: {
+    marginTop: "1rem",
+    display: "grid",
+    gridTemplateColumns: "repeat(auto-fill, minmax(320px, 1fr))",
+    gap: "1.5rem"
+  },
+  card: {
+    border: "1px solid #ddd",
+    padding: "1rem",
+    borderRadius: "10px",
+    backgroundColor: "#ffffff",
+    boxShadow: "0 4px 8px rgba(0, 0, 0, 0.06)",
+    transition: "transform 0.2s ease, box-shadow 0.2s ease",
+    lineHeight: "1.6",
+    fontSize: "0.95rem",
+    color: "#2c3e50"
+  },
+  image: {
+    width: "100%",
+    maxWidth: "200px",
+    height: "auto",
+    marginTop: "0.5rem",
+    borderRadius: "6px",
+    objectFit: "cover"
+  }
+};
 
 export default BrowseItems;

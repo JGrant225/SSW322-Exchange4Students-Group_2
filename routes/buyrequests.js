@@ -34,7 +34,6 @@ router.post("/", verifyToken, async (req, res) => {
 // Get all buy requests for the logged-in seller
 router.get("/seller", verifyToken, async (req, res) => {
   const seller = req.user.username;
-  console.log("[GET] Logged-in seller:", seller);
 
   try {
     const result = await pool.query(
@@ -46,6 +45,7 @@ router.get("/seller", verifyToken, async (req, res) => {
        FROM buy_requests br
        JOIN items i ON br.item_id = i.id
        WHERE LOWER(i.seller_username) = LOWER($1)
+         AND (br.cleared_by_seller IS FALSE OR br.cleared_by_seller IS NULL)
        ORDER BY br.requested_at DESC`,
       [seller]
     );
@@ -230,6 +230,45 @@ router.put('/clear/:id', verifyToken, async (req, res) => {
     res.json({ message: 'Buy request cleared.' });
   } catch (err) {
     console.error("Clear error:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
+// Route to clear a buy request for seller
+router.put('/clear-seller/:id', verifyToken, async (req, res) => {
+  const requestId = req.params.id;
+  const sellerUsername = req.user.username;
+
+  try {
+    // First verify this request is for an item owned by this seller
+    const checkQuery = await pool.query(
+      `SELECT br.id
+       FROM buy_requests br
+       JOIN items i ON br.item_id = i.id
+       WHERE br.id = $1 AND LOWER(i.seller_username) = LOWER($2)`,
+      [requestId, sellerUsername]
+    );
+
+    if (checkQuery.rowCount === 0) {
+      return res.status(404).json({ message: "Request not found or unauthorized" });
+    }
+
+    // Update the request to be cleared by seller
+    const result = await pool.query(
+      `UPDATE buy_requests
+       SET cleared_by_seller = TRUE
+       WHERE id = $1
+       RETURNING *;`,
+      [requestId]
+    );
+
+    if (result.rowCount === 0) {
+      return res.status(404).json({ message: "Request not found" });
+    }
+
+    res.json({ message: 'Buy request cleared.' });
+  } catch (err) {
+    console.error("[CLEAR-SELLER] Error:", err);
     res.status(500).json({ message: "Server error" });
   }
 });

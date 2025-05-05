@@ -10,6 +10,9 @@ const Login = ({ onLoginSuccess }) => {
   // State to show login result message
   const [message, setMessage] = useState("");
 
+    // State to manage password visibility
+    const [showPassword, setShowPassword] = useState(false);
+
   // Handle form input updates
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -45,13 +48,22 @@ const Login = ({ onLoginSuccess }) => {
           placeholder="Username"
           onChange={handleChange}
         />
+
         <input
           name="password"
-          type="password"
+          type={showPassword ? "text" : "password"}
           placeholder="Password"
           onChange={handleChange}
+          value={form.password}
         />
-        <button type="submit">Login</button>
+        <button
+          type="button"
+          className="password-button"
+          onClick={() => setShowPassword(!showPassword)}>
+          {showPassword ? "Hide Password" : "Show Password"}
+        </button>
+
+        <button className="login-button" type="submit">Login</button>
       </form>
       <p>{message}</p>
     </div>

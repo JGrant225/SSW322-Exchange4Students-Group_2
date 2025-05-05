@@ -66,6 +66,32 @@ export default function BuyerRequests({ username, token }) {
     }
   };
 
+  const handleClearRequest = async (requestId) => {
+    if (!window.confirm("Are you sure you want to clear this notification?")) return;
+  
+    try {
+      const response = await axios.put(
+        `${process.env.REACT_APP_API_URL}/buyrequests/clear/${requestId}`,
+        {},
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+  
+      // Remove from view
+      setRequests(requests.filter((req) => req.id !== requestId));
+  
+      setDeleteStatus({ message: "Notification cleared.", error: false });
+      setTimeout(() => setDeleteStatus({ message: "", error: false }), 3000);
+    } catch (err) {
+      console.error("[BuyerRequests] Clear Error:", err.response?.data || err.message);
+  
+      setDeleteStatus({
+        message: err.response?.data?.message || "Error clearing notification",
+        error: true,
+      });
+      setTimeout(() => setDeleteStatus({ message: "", error: false }), 5000);
+    }
+  };  
+
   if (location.pathname === "/checkout") return null;
 
   return (
@@ -153,6 +179,21 @@ export default function BuyerRequests({ username, token }) {
                     Cancel Request
                   </button>
                 )}
+                <button
+                  onClick={() => handleClearRequest(req.id)}
+                  style={{
+                    backgroundColor: "#6c757d",
+                    color: "white",
+                    border: "none",
+                    borderRadius: "5px",
+                    padding: "5px 10px",
+                    cursor: "pointer",
+                    marginTop: "5px",
+                    marginLeft: "10px"
+                  }}
+                >
+                  Clear Notification
+                </button>
               </div>
             ))
           )}

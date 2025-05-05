@@ -70,7 +70,7 @@ router.get("/buyer", verifyToken, async (req, res) => {
          i.title AS item_title, i.image AS item_image, i.itemstatus
        FROM buy_requests br
        JOIN items i ON br.item_id = i.id
-       WHERE br.buyer_username = $1
+       WHERE br.buyer_username = $1 AND (br.cleared_by_buyer IS FALSE OR br.cleared_by_buyer IS NULL)
        ORDER BY br.requested_at DESC`,
       [buyer]
     );
@@ -206,6 +206,31 @@ router.put("/:id/status", verifyToken, async (req, res) => {
   } catch (err) {
     console.error("[STATUS] Error updating request status:", err);
     res.status(500).json({ message: "Failed to update request status" });
+  }
+});
+
+// Route to clear a buy request
+router.put('/clear/:id', verifyToken, async (req, res) => {
+  const requestId = req.params.id;
+  const buyerUsername = req.user.username;
+
+  try {
+    const result = await pool.query(
+      `UPDATE buy_requests
+       SET cleared_by_buyer = TRUE
+       WHERE id = $1 AND buyer_username = $2
+       RETURNING *;`,
+      [requestId, buyerUsername]
+    );
+
+    if (result.rowCount === 0) {
+      return res.status(404).json({ message: "Request not found or unauthorized" });
+    }
+
+    res.json({ message: 'Buy request cleared.' });
+  } catch (err) {
+    console.error("Clear error:", err);
+    res.status(500).json({ message: "Server error" });
   }
 });
 

@@ -7,6 +7,7 @@ import Cart from './Pages/Cart';
 import CheckoutPage from './Pages/CheckoutPage';
 import SellerRequests from './Pages/SellerRequests';
 import BuyerRequests from './Pages/BuyerRequests';
+import BuyerOrderHistory from './Pages/BuyerOrderHistory';
 import React, { useState } from 'react';
 
 function AppWrapper() {
@@ -37,6 +38,7 @@ function AppWrapper() {
   };
 
   const isHomePage = location.pathname === "/";
+  const isCheckoutPage = location.pathname === "/checkout";
 
   return (
     <>
@@ -45,6 +47,7 @@ function AppWrapper() {
         <>
           <Cart username={username} token={token} refreshTrigger={cartUpdateTrigger} />
           <BuyerRequests username={username} token={token} />
+          {!isCheckoutPage && <BuyerOrderHistory username={username} token={token} />}
         </>
       )}
 

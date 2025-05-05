@@ -48,14 +48,50 @@ export default function CheckoutPage() {
 
   // Confirm checkout — validates input and processes buy requests
   const handleConfirmCheckout = async () => {
-    if (!form.fullName || !form.email || !form.phone) {
-      alert("Please fill out your full name, email, and phone number.");
+    if (!form.fullName && !form.email && !form.phone) {
+      alert("Please enter your full name, email, and phone number.");
+      return;
+    } 
+    if (!form.fullName && !form.email) {
+      alert("Please enter your full name and a valid email.");
       return;
     }
-
+    if (!form.fullName && !form.phone) {
+      alert("Please enter your full name and a valid phone number.");
+      return;
+    }
+    if (!form.email && !form.phone) {
+      alert("Please enter a valid email and phone number.");
+      return;
+    }
+    if (!form.fullName) {
+      alert("Please enter your full name.");
+      return;
+    }
+    if (!form.email) {
+      alert("Please enter a valid email.");
+      return;
+    }
+    if (!form.phone) {
+      alert("Please enter a valid phone number.");
+      return;
+    }
+    
     const phoneRegex = /^[0-9\-\+\s\(\)]+$/;
     if (!phoneRegex.test(form.phone)) {
       alert("Please enter a valid phone number.");
+      return;
+    }
+
+    const emailRegex = /^\S+@\S+\.\S+$/;
+    if (!emailRegex.test(form.email)) {
+      alert("Please enter a valid email.");
+      return;
+    }
+
+    const fullNameRegex = /^[a-zA-Z]+ [a-zA-Z]+$/;
+    if (!fullNameRegex.test(form.fullName)) {
+      alert("Please enter your full name.");
       return;
     }
 

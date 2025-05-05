@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-
+import "./CheckoutPage.css";
 // CheckoutPage component handles form input, displays cart items, and processes final order
 export default function CheckoutPage() {
   const navigate = useNavigate();
@@ -102,7 +102,7 @@ export default function CheckoutPage() {
   return (
     <div style={{ padding: "2rem", maxWidth: "700px", margin: "auto" }}>
       <h1>Checkout</h1>
-
+      <div class="ContactCheckout">
       {/* Contact Information Form */}
       <h3>Your Contact Info</h3>
       <form style={{ display: "grid", gap: "1rem" }}>
@@ -111,7 +111,7 @@ export default function CheckoutPage() {
         <input name="phone" type="tel" placeholder="Phone Number" onChange={handleInputChange} />
         <textarea name="message" placeholder="Optional message to seller" onChange={handleInputChange} />
       </form>
-
+  
       {/* Order Summary */}
       <h3>Cart Summary</h3>
       <ul>
@@ -124,8 +124,9 @@ export default function CheckoutPage() {
 
       {/* Action buttons for checkout and navigation */}
       <div style={{ display: "flex", gap: "1rem", marginTop: "1rem" }}>
-        <button onClick={handleConfirmCheckout}>Confirm Purchase</button>
-        <button onClick={handleBackToHome}>Back to Home</button>
+        <button class="ConfirmPurchase" onClick={handleConfirmCheckout}>Confirm Purchase</button>
+        <button class="BackToHome" onClick={handleBackToHome}>Back to Home</button>
+      </div>
       </div>
     </div>
   );

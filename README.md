@@ -161,5 +161,7 @@ This backend server provides RESTful API endpoints for basic functionality such 
       contact_phone TEXT NOT NULL,
       message TEXT,
       request_status VARCHAR(20) DEFAULT 'Pending' CHECK (request_status IN ('Pending', 'Accepted', 'Rejected')),
-      requested_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      requested_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      cleared_by_buyer BOOLEAN DEFAULT FALSE,
+      cleared_by_seller BOOLEAN DEFAULT FALSE,
     );

@@ -82,6 +82,52 @@ router.get("/buyer", verifyToken, async (req, res) => {
   }
 });
 
+// Delete a buy request
+router.delete("/:id", verifyToken, async (req, res) => {
+  const buyer = req.user.username;
+  const requestId = req.params.id;
+  
+  console.log(`[DELETE] Buyer: ${buyer} attempting to delete request ID: ${requestId}`);
+  
+  try {
+    // First check if this request belongs to this buyer
+    const checkQuery = await pool.query(
+      `SELECT * FROM buy_requests WHERE id = $1 AND buyer_username = $2`,
+      [requestId, buyer]
+    );
+    
+    if (checkQuery.rows.length === 0) {
+      console.warn(`[DELETE] Request ${requestId} not found or doesn't belong to ${buyer}`);
+      return res.status(404).json({ 
+        message: "Buy request not found or you don't have permission to delete it." 
+      });
+    }
+    
+    // Only allow deletion of requests that are in Pending status
+    if (checkQuery.rows[0].request_status !== 'Pending') {
+      console.warn(`[DELETE] Cannot delete request ${requestId} with status ${checkQuery.rows[0].request_status}`);
+      return res.status(400).json({
+        message: `Cannot delete requests with '${checkQuery.rows[0].request_status}' status. Only 'Pending' requests can be deleted.`
+      });
+    }
+    
+    // Delete the request
+    const deleteResult = await pool.query(
+      `DELETE FROM buy_requests WHERE id = $1 RETURNING *`,
+      [requestId]
+    );
+    
+    console.log(`[DELETE] Successfully deleted request ${requestId}`);
+    res.json({ 
+      message: "Buy request successfully deleted",
+      deletedRequest: deleteResult.rows[0]
+    });
+    
+  } catch (err) {
+    console.error("[DELETE] Error deleting buy request:", err);
+    res.status(500).json({ message: "Failed to delete buy request", error: err.message });
+  }
+});
 
 // Accept a buy request and reject others
 router.put("/:id/accept", verifyToken, async (req, res) => {

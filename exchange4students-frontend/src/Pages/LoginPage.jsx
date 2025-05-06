@@ -118,11 +118,16 @@ export function LoginPage({ onCartUpdate, onRoleChange, onLogout }) {
 
       {/* Seller view */}
       {selectedTab === "seller" && (
-        <>
-          <PostItem username={username} token={token} onItemPosted={handleItemPosted} />
-          <SellerItems username={username} token={token} refreshTrigger={refreshItems} />
-        </>
+        <div style={{ display: "flex", gap: "2rem", alignItems: "flex-start" }}>
+          <div style={{ flex: 1 }}>
+            <PostItem username={username} token={token} onItemPosted={handleItemPosted} />
+          </div>
+          <div style={{ flex: 2 }}>
+            <SellerItems username={username} token={token} refreshTrigger={refreshItems} />
+          </div>
+        </div>
       )}
+
 
       {/* Buyer view */}
       {selectedTab === "buyer" && username && token && (

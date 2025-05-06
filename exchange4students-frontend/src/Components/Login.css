@@ -17,7 +17,7 @@
     border: 1px solid #ddd;
   }
   
-  .login-container button {
+  .login-button {
     display: block;
     width: 15%;
     padding: 0.6rem;
@@ -61,4 +61,17 @@
 
   button:active {
     transform: scale(0.96);
+  }
+
+  .password-button {
+    display: block;
+    width: 15%;
+    padding: 0.6rem;
+    margin: 0 auto 1rem auto; 
+    background-color: #f1f1f1;
+    color: black;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
   }

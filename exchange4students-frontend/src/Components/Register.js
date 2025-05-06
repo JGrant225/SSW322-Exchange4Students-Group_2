@@ -10,6 +10,9 @@ const Register = () => {
   // State to store server response message (success or error)
   const [message, setMessage] = useState("");
 
+  // State to manage password visibility
+  const [showPassword, setShowPassword] = useState(false);
+
   // Handle changes in the input fields
   const handleChange = (e) => {
     // Update form state dynamically based on input name
@@ -21,8 +24,16 @@ const handleSubmit = async (e) => {
   e.preventDefault(); // Prevent page refresh on submit
 
   // Client-side validation for empty fields
-  if (!form.username || !form.password) {
+  if (!form.username && !form.password) {
     setMessage("Username and password cannot be empty");
+    return;
+  }
+  if (!form.username) {
+    setMessage("Username cannot be empty");
+    return;
+  }
+  if (!form.password) {
+    setMessage("Password cannot be empty");
     return;
   }
 
@@ -51,17 +62,23 @@ const handleSubmit = async (e) => {
           placeholder="Username"
           onChange={handleChange}
         />
-
         {/* Input for password */}
         <input
           name="password"
-          type="password"
+          type={showPassword ? "text" : "password"}
           placeholder="Password"
           onChange={handleChange}
-        />
+          value={form.password}
+        />   
+        <button
+          type="button"
+          className="password-button"
+          onClick={() => setShowPassword(!showPassword)}>
+          {showPassword ? "Hide Password" : "Show Password"}
+        </button>
 
         {/* Submit button */}
-        <button type="submit">Register</button>
+        <button className="register-button" type="submit">Register</button>
       </form>
 
       {/* Show message below the form */}

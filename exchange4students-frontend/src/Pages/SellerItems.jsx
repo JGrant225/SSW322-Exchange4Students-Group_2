@@ -208,10 +208,11 @@ export default function SellerItems({ username, token, refreshTrigger }) {
       minHeight: "300px",
       display: "flex",
       flexDirection: "column",
-      justifyContent: "space-between",
+      alignItems: "stretch",
+      gap: "0.75rem",
       maxHeight: "none",
       overflow: "visible"
-    },    
+    },
     input: {
       padding: "0.5rem",
       borderRadius: "4px",
@@ -231,6 +232,11 @@ export default function SellerItems({ username, token, refreshTrigger }) {
       height: "auto",
       marginTop: "0.5rem",
     },
+    fieldGroup: {
+      display: "flex",
+      flexDirection: "column",
+      gap: "0.25rem",
+    }
   };  
 
   return (
@@ -258,28 +264,43 @@ export default function SellerItems({ username, token, refreshTrigger }) {
               boxSizing: "border-box",
             }}
           >
-            <input
-              name="title"
-              value={editForm.title}
-              onChange={handleEditChange}
-              placeholder="Title"
-              style={{
-                ...styles.input,
-                backgroundColor: "yellow",
-                fontSize: "1.25rem"
-              }}
-            />
-            <textarea
-              name="description"
-              value={editForm.description}
-              onChange={handleEditChange}
-              placeholder="Description"
-              style={{ ...styles.input, minHeight: "80px" }}
-            />
-            <label>
-              Category:
+            <div>
+            <div style={styles.fieldGroup}>
+              <label htmlFor="title">Title</label>
+              <input
+                name="title"
+                id="title"
+                value={editForm.title}
+                onChange={handleEditChange}
+                placeholder="Title"
+                style={{
+                  ...styles.input,
+                  backgroundColor: "yellow",
+                  fontSize: "1.25rem"
+                }}
+              />
+            </div>
+            </div>
+          
+            <div>
+            <div style={styles.fieldGroup}>
+              <label htmlFor="description">Description</label>
+              <textarea
+                name="description"
+                id="description"
+                value={editForm.description}
+                onChange={handleEditChange}
+                style={{ ...styles.input, minHeight: "80px" }}
+              />
+            </div>
+            </div>
+          
+            <div>
+            <div style={styles.fieldGroup}>
+              <label htmlFor="category">Category</label>
               <select
                 name="category"
+                id="category"
                 value={editForm.category}
                 onChange={handleEditChange}
                 style={styles.input}
@@ -291,30 +312,40 @@ export default function SellerItems({ username, token, refreshTrigger }) {
                 <option value="Music">Music</option>
                 <option value="Misc">Misc</option>
               </select>
-            </label>
-            <input
-              name="dimensions"
-              placeholder={
-                editForm.category === "Clothes"
-                  ? "e.g. Shoulder Width x Length"
-                  : editForm.category === "Technology"
-                  ? "e.g. Screen Size, Depth"
-                  : editForm.category === "Sports"
-                  ? "e.g. Diameter, Length"
-                  : editForm.category === "Music"
-                  ? "e.g. Instrument Size"
-                  : "e.g. Size or Measurements"
-              }
-              value={editForm.dimensions}
-              onChange={handleEditChange}
-              style={styles.input}
-            />
-
+            </div>
+            </div>
+          
+            <div>
+            <div style={styles.fieldGroup}>
+              <label htmlFor="dimensions">Dimensions</label>
+              <input
+                name="dimensions"
+                id="dimensions"
+                placeholder={
+                  editForm.category === "Clothes"
+                    ? "e.g. Shoulder Width x Length"
+                    : editForm.category === "Technology"
+                    ? "e.g. Screen Size, Depth"
+                    : editForm.category === "Sports"
+                    ? "e.g. Diameter, Length"
+                    : editForm.category === "Music"
+                    ? "e.g. Instrument Size"
+                    : "e.g. Size or Measurements"
+                }
+                value={editForm.dimensions}
+                onChange={handleEditChange}
+                style={styles.input}
+              />
+            </div>
+            </div>
+          
             {editForm.category === "Clothes" && (
-              <label>
-                Size:
+              <div>
+                <div style={styles.fieldGroup}>
+                <label htmlFor="size">Size</label>
                 <select
                   name="size"
+                  id="size"
                   value={editForm.size}
                   onChange={handleEditChange}
                   style={styles.input}
@@ -327,27 +358,43 @@ export default function SellerItems({ username, token, refreshTrigger }) {
                   <option value="XL">XL</option>
                   <option value="XXL">XXL</option>
                 </select>
-              </label>
+              </div>
+              </div>
             )}
+          
             {["Clothes", "Sports", "Music", "Misc"].includes(editForm.category) && (
+              <div>
+                <div style={styles.fieldGroup}>
+                <label htmlFor="color">Color</label>
+                <input
+                  name="color"
+                  id="color"
+                  value={editForm.color}
+                  onChange={handleEditChange}
+                  style={styles.input}
+                />
+              </div>
+              </div>
+            )}
+          
+            <div>
+            <div style={styles.fieldGroup}>
+              <label htmlFor="image">Upload New Image</label>
               <input
-                name="color"
-                value={editForm.color}
-                onChange={handleEditChange}
-                placeholder="Color (e.g. Red)"
+                type="file"
+                accept="image/*"
+                onChange={handleImageChange}
                 style={styles.input}
               />
-            )}
-            <input
-              type="file"
-              accept="image/*"
-              onChange={handleImageChange}
-              style={styles.input}
-            />
-            <label>
-              Item Status:
+            </div>
+            </div>
+          
+            <div>
+              <div style={styles.fieldGroup}>
+              <label htmlFor="itemstatus">Item Status</label>
               <select
                 name="itemstatus"
+                id="itemstatus"
                 value={editForm.itemstatus}
                 onChange={handleEditChange}
                 style={styles.input}
@@ -356,9 +403,12 @@ export default function SellerItems({ username, token, refreshTrigger }) {
                 <option value="On Hold">On Hold</option>
                 <option value="Sold">Sold</option>
               </select>
-            </label>
+            </div>
+            </div>
+          
             {editForm.image && (
               <div>
+                <div style={styles.fieldGroup}>
                 <strong>New image:</strong>
                 <img
                   src={URL.createObjectURL(editForm.image)}
@@ -366,7 +416,9 @@ export default function SellerItems({ username, token, refreshTrigger }) {
                   style={styles.image}
                 />
               </div>
+              </div>
             )}
+          
             <div style={{ display: "flex", gap: "0.5rem", marginTop: "0.5rem" }}>
               <button type="submit" style={{ ...styles.button, backgroundColor: "#4CAF50" }}>
                 Save
@@ -380,6 +432,7 @@ export default function SellerItems({ username, token, refreshTrigger }) {
               </button>
             </div>
           </form>
+        
         ) : (
           <>
             <h3 style={{ marginBottom: "0.5rem" }}>{item.title}</h3>

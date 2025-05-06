@@ -1,6 +1,15 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 
+//Category icons to improve UI
+const categoryIcons = {
+  Sports: "🏀",
+  Music: "🎧",
+  Technology: "🛠",
+  Clothes: "👕",
+  Misc: "📦"
+};
+
 // BrowseItems component allows buyers to browse items by category and add them to the cart
 export function BrowseItems({ onCartUpdate, username, token }) {
   const [selectedCategory, setSelectedCategory] = useState(null);
@@ -61,7 +70,7 @@ export function BrowseItems({ onCartUpdate, username, token }) {
       console.log(`[BrowseItems] Items returned: ${response.data.length}`);
       setDebugInfo(prev => prev + `Response status: ${response.status}\nItems returned: ${response.data.length}\n`);
       
-      setItems(response.data);
+      setItems(response.data.map(item => ({ ...item, showFullDesc: false })));
     } catch (err) {
       const errorMessage = err.response ? 
         `Error ${err.response.status}: ${err.response.data.message || err.message}` :
@@ -230,6 +239,15 @@ export function BrowseItems({ onCartUpdate, username, token }) {
     }
   };
 
+  // Toggles description expansion by item ID
+  const toggleDescription = (itemId) => {
+    setItems(prevItems =>
+      prevItems.map(item =>
+        item.id === itemId ? { ...item, showFullDesc: !item.showFullDesc } : item
+      )
+    );
+  };
+
   return (
     <div style={styles.container}>
       <h1 style={styles.title}>Welcome to the Marketplace</h1>
@@ -247,6 +265,7 @@ export function BrowseItems({ onCartUpdate, username, token }) {
               color: selectedCategory === category ? "#fff" : "#333",
             }}
           >
+            <span style={{ marginRight: "0.5rem" }}>{categoryIcons[category]}</span>
             {category}
           </button>
         ))}
@@ -344,14 +363,21 @@ export function BrowseItems({ onCartUpdate, username, token }) {
         {items.map((item) => (
           <div key={item.id} style={styles.card} className="fade-in">
             <h3>{item.title}</h3>
-            <p>{item.description}</p>
-            <p><strong>Price:</strong> ${item.price}</p>
-            <p><strong>Seller:</strong> {item.seller_username}</p>
-            <p><strong>Category:</strong> {item.category || "None"}</p>
-            <p><strong>Dimensions:</strong> {item.dimensions || "Not specified"}</p>
-            <p><strong>Size:</strong> {item.size && item.size !== 'N/A' ? item.size : "Not applicable"}</p>
-            <p><strong>Color:</strong> {item.color || "Not specified"}</p>
-            <p><strong>Item Status:</strong> {item.itemstatus || "Available"}</p>
+            {item.description && (
+              <p className="clamp-description">
+                {item.description}
+              </p>
+            )}
+            <div style={styles.metadataGrid}>
+              <div><strong>Price:</strong> ${item.price}</div>
+              <div><strong>Seller:</strong> {item.seller_username}</div>
+              <div><strong>Category:</strong> {item.category || "None"}</div>
+              <div><strong>Dimensions:</strong> {item.dimensions || "Not specified"}</div>
+              <div><strong>Size:</strong> {item.size && item.size !== 'N/A' ? item.size : "Not applicable"}</div>
+              <div><strong>Color:</strong> {item.color || "Not specified"}</div>
+              <div><strong>Item Status:</strong> {item.itemstatus || "Available"}</div>
+            </div>
+
 
             {item.image && (
               <img
@@ -361,18 +387,21 @@ export function BrowseItems({ onCartUpdate, username, token }) {
               />
             )}
 
-            {item.itemstatus === "Available" ? (
-              <button
-                style={{ ...styles.button, backgroundColor: "#007bff", marginTop: "0.5rem" }}
-                onClick={() => handleAddToCart(item.id)}
-              >
-                Add to Cart
-              </button>
-            ) : (
-              <p style={{ color: "red", fontWeight: "bold" }}>
-                Item not available for purchase ({item.itemstatus})
-              </p>
-            )}
+            <div style={{ marginTop: "auto" }}>
+              {item.itemstatus === "Available" ? (
+                <button
+                  style={{ ...styles.button, backgroundColor: "#007bff", width: "100%", marginTop: "1rem" }}
+                  onClick={() => handleAddToCart(item.id)}
+                >
+                  Add to Cart
+                </button>
+              ) : (
+                <p style={{ color: "red", fontWeight: "bold", marginTop: "1rem" }}>
+                  Item not available for purchase ({item.itemstatus})
+                </p>
+              )}
+            </div>
+
 
           </div>
         ))}
@@ -392,6 +421,15 @@ export function BrowseItems({ onCartUpdate, username, token }) {
               opacity: 1;
               transform: translateY(0);
             }
+          }
+          
+          .clamp-description {
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            margin-bottom: 0.75rem;
           }
 
           button {
@@ -427,27 +465,31 @@ const styles = {
     color: "#2c3e50",
     fontSize: "2.5rem",
     fontWeight: "700",
-    marginBottom: "0.25rem"
+    marginBottom: "0.25rem",
+    textAlign: "center"
   },
   subtitle: {
     color: "#6c757d",
     fontSize: "1.25rem",
     fontWeight: "500",
-    marginBottom: "1.5rem"
+    marginBottom: "1.5rem",
+    textAlign: "center"
   },
   buttonGroup: {
     marginBottom: "1rem",
     display: "flex",
     flexWrap: "wrap",
-    gap: "0.5rem"
+    gap: "0.5rem",
+    justifyContent: "center"
   },
   categoryButton: {
-    padding: "0.5rem 1rem",
-    borderRadius: "6px",
+    padding: "0.6rem 1rem",
+    fontSize: "0.8rem",
+    borderRadius: "8px",
     border: "none",
     backgroundColor: "#e0e0e0",
     color: "#2c3e50",
-    fontWeight: "500",
+    fontWeight: "600",
     cursor: "pointer"
   },
   searchContainer: {
@@ -501,16 +543,28 @@ const styles = {
     transition: "transform 0.2s ease, box-shadow 0.2s ease",
     lineHeight: "1.6",
     fontSize: "0.95rem",
-    color: "#2c3e50"
+    color: "#2c3e50",
+    position: "relative",
+    display: "flex",
+    flexDirection: "column",
+    justifyContent: "space-between"
   },
   image: {
     width: "100%",
-    maxWidth: "200px",
     height: "auto",
     marginTop: "0.5rem",
+    marginBottom: "1rem",
     borderRadius: "6px",
-    objectFit: "cover"
-  }
+    objectFit: "cover",
+    display: "block"
+  },
+  metadataGrid: {
+    display: "grid",
+    gridTemplateColumns: "1fr 1fr",
+    gap: "0.25rem 0.5rem",
+    marginTop: "0.5rem",
+    fontSize: "0.85rem"
+  }  
 };
 
 export default BrowseItems;

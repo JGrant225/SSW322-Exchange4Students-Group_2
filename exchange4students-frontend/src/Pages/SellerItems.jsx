@@ -5,6 +5,7 @@ import axios from "axios";
 export default function SellerItems({ username, token, refreshTrigger }) {
   // State to hold all items posted by this seller
   const [items, setItems] = useState([]);
+  const [category, setCategory] = useState("");
 
   // State to track which item is being edited
   const [editingItemId, setEditingItemId] = useState(null);
@@ -21,6 +22,7 @@ export default function SellerItems({ username, token, refreshTrigger }) {
     color: "",
     itemstatus: ""
   });
+
 
   const inputStyle = {
     padding: "0.5rem",
@@ -118,6 +120,7 @@ export default function SellerItems({ username, token, refreshTrigger }) {
       color: item.color || "",
       itemstatus: item.itemstatus || "Available"
     });
+    setCategory(item.category || "");
   };
 
   // Update form text fields
@@ -202,7 +205,13 @@ export default function SellerItems({ username, token, refreshTrigger }) {
       borderRadius: "8px",
       backgroundColor: "#fff",
       boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
-    },
+      minHeight: "300px",
+      display: "flex",
+      flexDirection: "column",
+      justifyContent: "space-between",
+      maxHeight: "none",
+      overflow: "visible"
+    },    
     input: {
       padding: "0.5rem",
       borderRadius: "4px",
@@ -238,61 +247,70 @@ export default function SellerItems({ username, token, refreshTrigger }) {
       {items.map((item) => (
         <div key={item.id} style={styles.card} className="fade-in">
           {editingItemId === item.id ? (
-            <form
-              onSubmit={handleEditSubmit}
-              encType="multipart/form-data"
-              style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}
-            >
-              <input
-                name="title"
-                value={editForm.title}
+          <form
+            onSubmit={handleEditSubmit}
+            encType="multipart/form-data"
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              gap: "0.75rem",
+              width: "100%",
+              boxSizing: "border-box",
+            }}
+          >
+            <input
+              name="title"
+              value={editForm.title}
+              onChange={handleEditChange}
+              placeholder="Title"
+              style={{
+                ...styles.input,
+                backgroundColor: "yellow",
+                fontSize: "1.25rem"
+              }}
+            />
+            <textarea
+              name="description"
+              value={editForm.description}
+              onChange={handleEditChange}
+              placeholder="Description"
+              style={{ ...styles.input, minHeight: "80px" }}
+            />
+            <label>
+              Category:
+              <select
+                name="category"
+                value={editForm.category}
                 onChange={handleEditChange}
-                placeholder="Title"
-                style={{
-                  padding: "20px",
-                  backgroundColor: "yellow",
-                  fontSize: "1.5rem"}}
-              />
-              <textarea
-                name="description"
-                value={editForm.description}
-                onChange={handleEditChange}
-                placeholder="Description"
-                style={{ ...styles.input, minHeight: "80px" }}
-              />
-              <input
-                name="price"
-                type="number"
-                value={editForm.price}
-                onChange={handleEditChange}
-                placeholder="Price"
                 style={styles.input}
-              />
-              <label>
-                Category:
-                <select
-                  name="category"
-                  value={editForm.category}
-                  onChange={handleEditChange}
-                  style={styles.input}
-                >
-                  <option value="">(No Change)</option>
-                  <option value="Sports">Sports</option>
-                  <option value="Music">Music</option>
-                  <option value="Technology">Technology</option>
-                  <option value="Clothes">Clothes</option>
-                  <option value="Misc">Misc</option>
-                </select>
-              </label>
+              >
+                <option value="">Select Category</option>
+                <option value="Clothes">Clothes</option>
+                <option value="Technology">Technology</option>
+                <option value="Sports">Sports</option>
+                <option value="Music">Music</option>
+                <option value="Misc">Misc</option>
+              </select>
+            </label>
+            <input
+              name="dimensions"
+              placeholder={
+                editForm.category === "Clothes"
+                  ? "e.g. Shoulder Width x Length"
+                  : editForm.category === "Technology"
+                  ? "e.g. Screen Size, Depth"
+                  : editForm.category === "Sports"
+                  ? "e.g. Diameter, Length"
+                  : editForm.category === "Music"
+                  ? "e.g. Instrument Size"
+                  : "e.g. Size or Measurements"
+              }
+              value={editForm.dimensions}
+              onChange={handleEditChange}
+              style={styles.input}
+            />
 
-              <input
-                name="dimensions"
-                value={editForm.dimensions}
-                onChange={handleEditChange}
-                placeholder="Dimensions (e.g. 10x20)"
-                style={styles.input}
-              />
-
+            {editForm.category === "Clothes" && (
               <label>
                 Size:
                 <select
@@ -301,7 +319,7 @@ export default function SellerItems({ username, token, refreshTrigger }) {
                   onChange={handleEditChange}
                   style={styles.input}
                 >
-                  <option value="">(No Change)</option>
+                  <option value="">Select Size</option>
                   <option value="XS">XS</option>
                   <option value="S">S</option>
                   <option value="M">M</option>
@@ -310,7 +328,8 @@ export default function SellerItems({ username, token, refreshTrigger }) {
                   <option value="XXL">XXL</option>
                 </select>
               </label>
-
+            )}
+            {["Clothes", "Sports", "Music", "Misc"].includes(editForm.category) && (
               <input
                 name="color"
                 value={editForm.color}
@@ -318,88 +337,92 @@ export default function SellerItems({ username, token, refreshTrigger }) {
                 placeholder="Color (e.g. Red)"
                 style={styles.input}
               />
-
-              <input
-                type="file"
-                accept="image/*"
-                onChange={handleImageChange}
+            )}
+            <input
+              type="file"
+              accept="image/*"
+              onChange={handleImageChange}
+              style={styles.input}
+            />
+            <label>
+              Item Status:
+              <select
+                name="itemstatus"
+                value={editForm.itemstatus}
+                onChange={handleEditChange}
                 style={styles.input}
-              />
-
-              <label>
-                Item Status:
-                <select
-                  name="itemstatus"
-                  value={editForm.itemstatus}
-                  onChange={handleEditChange}
-                  style={styles.input}
-                >
-                  <option value="Available">Available</option>
-                  <option value="On Hold">On Hold</option>
-                  <option value="Sold">Sold</option>
-                </select>
-              </label>
-
-              {editForm.image && (
-                <div>
-                  <strong>New image:</strong>
-                  <img
-                    src={URL.createObjectURL(editForm.image)}
-                    alt="Preview"
-                    style={styles.image}
-                  />
-                </div>
-              )}
-
-              <div style={{ display: "flex", gap: "0.5rem", marginTop: "0.5rem" }}>
-                <button type="submit" style={{ ...styles.button, backgroundColor: "#4CAF50" }}>
-                  Save
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setEditingItemId(null)}
-                  style={{ ...styles.button, backgroundColor: "#777" }}
-                >
-                  Cancel
-                </button>
-              </div>  
-            </form>
-          ) : (
-            <>
-              <h3 style={{ marginBottom: "0.5rem" }}>{item.title}</h3>
-              <p>{item.description}</p>
-              <p><strong>Price:</strong> ${item.price}</p>
-              <p><strong>Category:</strong> {item.category || "N/A"}</p>
-              <p><strong>Dimensions:</strong> {item.dimensions || "Not specified"}</p>
-              <p><strong>Size:</strong> {item.size || "Not specified"}</p>
-              <p><strong>Color:</strong> {item.color || "Not specified"}</p>
-              <p><strong>Item Status:</strong> {item.itemstatus || "Available"}</p>
-
-              {item.image && (
+              >
+                <option value="Available">Available</option>
+                <option value="On Hold">On Hold</option>
+                <option value="Sold">Sold</option>
+              </select>
+            </label>
+            {editForm.image && (
+              <div>
+                <strong>New image:</strong>
                 <img
-                  src={`${process.env.REACT_APP_API_URL}/uploads/${item.image}`}
-                  alt={item.title}
+                  src={URL.createObjectURL(editForm.image)}
+                  alt="Preview"
                   style={styles.image}
                 />
-              )}
-
-              <div style={{ display: "flex", gap: "0.5rem", marginTop: "0.75rem" }}>
-                <button
-                  onClick={() => handleEditClick(item)}
-                  style={{ ...styles.button, backgroundColor: "#007bff" }}
-                >
-                  Edit
-                </button>
-                <button
-                  onClick={() => handleDelete(item.id)}
-                  style={{ ...styles.button, backgroundColor: "#f44336" }}
-                >
-                  Delete
-                </button>
               </div>
-            </>
-          )}
-        </div>
+            )}
+            <div style={{ display: "flex", gap: "0.5rem", marginTop: "0.5rem" }}>
+              <button type="submit" style={{ ...styles.button, backgroundColor: "#4CAF50" }}>
+                Save
+              </button>
+              <button
+                type="button"
+                onClick={() => setEditingItemId(null)}
+                style={{ ...styles.button, backgroundColor: "#777" }}
+              >
+                Cancel
+              </button>
+            </div>
+          </form>
+        ) : (
+          <>
+            <h3 style={{ marginBottom: "0.5rem" }}>{item.title}</h3>
+            <div style={{ marginBottom: "0.5rem" }}>
+              <p style={{ ...metaStyle }}>{item.description}</p>
+              <p style={{ ...metaStyle }}><strong>Price:</strong> ${item.price}</p>
+              <p style={{ ...metaStyle }}><strong>Category:</strong> {item.category || "N/A"}</p>
+              <p style={{ ...metaStyle }}><strong>Dimensions:</strong> {item.dimensions || "Not specified"}</p>
+              <p style={{ ...metaStyle }}><strong>Size:</strong> {item.size || "Not specified"}</p>
+              <p style={{ ...metaStyle }}><strong>Color:</strong> {item.color || "Not specified"}</p>
+              <p style={{ ...metaStyle }}><strong>Item Status:</strong> {item.itemstatus || "Available"}</p>
+            </div>
+            {item.image && (
+              <img
+                src={`${process.env.REACT_APP_API_URL}/uploads/${item.image}`}
+                alt={item.title}
+                style={{
+                  ...styles.image,
+                  maxHeight: "100px",
+                  height: "auto",
+                  width: "100%",
+                  objectFit: "contain"
+                }}
+              />
+            )}
+            <div style={{ display: "flex", gap: "0.5rem", marginTop: "0.75rem" }}>
+              <button
+                onClick={() => handleEditClick(item)}
+                style={{ ...styles.button, backgroundColor: "#007bff" }}
+              >
+                Edit
+              </button>
+              <button
+                onClick={() => handleDelete(item.id)}
+                style={{ ...styles.button, backgroundColor: "#f44336" }}
+              >
+                Delete
+              </button>
+            </div>
+          </>
+        )}
+
+         </div> 
       ))}
     </div>
     {/* CSS animations */}

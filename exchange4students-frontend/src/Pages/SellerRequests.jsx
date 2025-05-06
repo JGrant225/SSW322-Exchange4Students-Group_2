@@ -220,6 +220,7 @@ export default function SellerRequests({ username, token }) {
                       </button>
                     </>
                   )}
+                  {(req.request_status === "Accepted" || req.request_status === "Rejected") && (
                   <button
                     onClick={() => handleClearRequest(req.id)}
                     style={{
@@ -233,6 +234,7 @@ export default function SellerRequests({ username, token }) {
                   >
                     Clear Notification
                   </button>
+                  )}
                 </div>
               </div>
             ))

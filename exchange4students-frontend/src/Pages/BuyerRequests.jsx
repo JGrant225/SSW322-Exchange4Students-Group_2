@@ -179,21 +179,23 @@ export default function BuyerRequests({ username, token }) {
                     Cancel Request
                   </button>
                 )}
-                <button
-                  onClick={() => handleClearRequest(req.id)}
-                  style={{
-                    backgroundColor: "#6c757d",
-                    color: "white",
-                    border: "none",
-                    borderRadius: "5px",
-                    padding: "5px 10px",
-                    cursor: "pointer",
-                    marginTop: "5px",
-                    marginLeft: "10px"
-                  }}
-                >
-                  Clear Notification
-                </button>
+                {(req.request_status === "Accepted" || req.request_status === "Rejected") && (
+                  <button
+                    onClick={() => handleClearRequest(req.id)}
+                    style={{
+                      backgroundColor: "#6c757d",
+                      color: "white",
+                      border: "none",
+                      borderRadius: "5px",
+                      padding: "5px 10px",
+                      cursor: "pointer",
+                      marginTop: "5px",
+                      marginLeft: "10px"
+                    }}
+                  >
+                    Clear Notification
+                  </button>
+                )}
               </div>
             ))
           )}

@@ -37,32 +37,17 @@ export function BrowseItems({ onCartUpdate, username, token }) {
       // Build query parameters
       const params = new URLSearchParams();
       if (category) params.append("category", category);
-      
-      // Create combined search with filters
-      let combinedSearch = search || '';
-      
-      if (sizeFilter) {
-        combinedSearch += combinedSearch ? `, ${sizeFilter}` : sizeFilter;
-      }
-      
-      if (colorFilter) {
-        combinedSearch += combinedSearch ? `, ${colorFilter}` : colorFilter;
-      }
-      
-      if (dimensionsFilter) {
-        combinedSearch += combinedSearch ? `, ${dimensionsFilter}` : dimensionsFilter;
-      }
-      
-      if (combinedSearch) {
-        params.append("search", combinedSearch.trim());
-      }
+      if (search) params.append("search", search.trim());
+      if (sizeFilter) params.append("size", sizeFilter.trim());
+      if (colorFilter) params.append("color", colorFilter.trim());
+      if (dimensionsFilter) params.append("dimensions", dimensionsFilter.trim());
+
       
       const apiUrl = `${process.env.REACT_APP_API_URL}/items`;
       const fullUrl = `${apiUrl}${params.toString() ? `?${params.toString()}` : ''}`;
       
       console.log(`[BrowseItems] Making API request to: ${fullUrl}`);
       setDebugInfo(prev => prev + `Making request to: ${fullUrl}\n`);
-      console.log(`[BrowseItems] Combined search terms: ${combinedSearch}`);
       
       const response = await axios.get(fullUrl);
       

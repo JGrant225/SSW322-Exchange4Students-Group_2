@@ -15,6 +15,8 @@ const PostItem = ({ username, token, onItemPosted }) => {
     color: ""
   });
 
+  const [category, setCategory] = useState("");
+
   // State to store selected image file
   const [image, setImage] = useState(null);
 
@@ -173,8 +175,12 @@ const PostItem = ({ username, token, onItemPosted }) => {
             <select
               name="category"
               value={form.category}
-              onChange={handleChange}
+              onChange={(e) => {
+                handleChange(e);
+                setCategory(e.target.value);
+              }}
             >
+
               <option value="">Select Category</option>
               <option value="Sports">Sports</option>
               <option value="Music">Music</option>
@@ -183,49 +189,77 @@ const PostItem = ({ username, token, onItemPosted }) => {
               <option value="Misc">Misc</option>
             </select><br />
 
-            {/* Dimensions input */}
-            <input
-              name="dimensions"
-              placeholder="Dimensions (e.g. 10x20)"
-              value={form.dimensions}
-              onChange={handleChange}               style={{
-                padding: "0.5rem 0.75rem",
-                borderRadius: "6px",
-                border: "1px solid #ccc",
-                fontSize: "1rem",
-                color: "#2c3e50",
-                margin: "0.5rem"              
-              }}/><br />
+            {/* Conditional Dimensions field with dynamic placeholder */}
+            {category && (
+              <input
+                name="dimensions"
+                placeholder={
+                  category === "Clothes"
+                    ? "e.g. Shoulder Width x Length"
+                    : category === "Technology"
+                    ? "e.g. Screen Size, Depth"
+                    : category === "Sports"
+                    ? "e.g. Diameter, Length"
+                    : "e.g. Size or Measurements"
+                }
+                value={form.dimensions}
+                onChange={handleChange}
+                style={{
+                  padding: "0.5rem 0.75rem",
+                  borderRadius: "6px",
+                  border: "1px solid #ccc",
+                  fontSize: "1rem",
+                  color: "#2c3e50",
+                  margin: "0.5rem"
+                }}
+              />
+            )}<br />
 
-            {/* Size dropdown */}
-            <select
-              name="size"
-              value={form.size}
-              onChange={handleChange}
-            >
-              <option value="">Select Size</option>
-              <option value="XS">XS</option>
-              <option value="S">S</option>
-              <option value="M">M</option>
-              <option value="L">L</option>
-              <option value="XL">XL</option>
-              <option value="XXL">XXL</option>
-            </select><br />
 
-            {/* Color input */}
-            <input
-              name="color"
-              placeholder="Color (e.g. Red)"
-              value={form.color}
-              onChange={handleChange}               
-              style={{
-                padding: "0.5rem 0.75rem",
-                borderRadius: "6px",
-                border: "1px solid #ccc",
-                fontSize: "1rem",
-                color: "#2c3e50",
-                margin: "0.5rem"              
-              }}/><br />
+            {/* Show size only for Clothes */}
+            {category === "Clothes" && (
+              <select
+                name="size"
+                value={form.size}
+                onChange={handleChange}
+                style={{
+                  padding: "0.5rem 0.75rem",
+                  borderRadius: "6px",
+                  border: "1px solid #ccc",
+                  fontSize: "1rem",
+                  color: "#2c3e50",
+                  margin: "0.5rem"
+                }}
+              >
+                <option value="">Select Size</option>
+                <option value="XS">XS</option>
+                <option value="S">S</option>
+                <option value="M">M</option>
+                <option value="L">L</option>
+                <option value="XL">XL</option>
+                <option value="XXL">XXL</option>
+              </select>
+            )}<br />
+
+
+            {/* Show color for specific categories */}
+            {["Clothes", "Sports", "Music", "Misc"].includes(category) && (
+              <input
+                name="color"
+                placeholder="Color (e.g. Red)"
+                value={form.color}
+                onChange={handleChange}               
+                style={{
+                  padding: "0.5rem 0.75rem",
+                  borderRadius: "6px",
+                  border: "1px solid #ccc",
+                  fontSize: "1rem",
+                  color: "#2c3e50",
+                  margin: "0.5rem"              
+                }}
+              />
+            )}<br />
+
 
             {/* File upload */}
             <label>

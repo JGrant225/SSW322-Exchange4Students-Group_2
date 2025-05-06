@@ -136,33 +136,120 @@ export default function CheckoutPage() {
   };
 
   return (
-    <div style={{ padding: "2rem", maxWidth: "700px", margin: "auto" }}>
+    <div style={{
+      padding: "2rem",
+      maxWidth: "700px",
+      margin: "auto",
+      fontFamily: "'Segoe UI', Tahoma, sans-serif",
+      color: "#2c3e50"
+    }}>    
       <h1>Checkout</h1>
 
       {/* Contact Information Form */}
       <h3>Your Contact Info</h3>
-      <form style={{ display: "grid", gap: "1rem" }}>
-        <input name="fullName" placeholder="Full Name" onChange={handleInputChange} />
-        <input name="email" placeholder="Email Address" onChange={handleInputChange} />
-        <input name="phone" type="tel" placeholder="Phone Number" onChange={handleInputChange} />
-        <textarea name="message" placeholder="Optional message to seller" onChange={handleInputChange} />
+      <form style={{ display: "flex", flexDirection: "column", gap: "1rem", marginBottom: "1.5rem" }}>
+        <input 
+          name="fullName" 
+          placeholder="Full Name" 
+          onChange={handleInputChange} 
+          style={{ padding: "0.5rem", borderRadius: "6px", border: "1px solid #ccc", fontSize: "1rem" }}
+        />
+        <input 
+          name="email" 
+          placeholder="Email Address" 
+          onChange={handleInputChange} 
+          style={{ padding: "0.5rem", borderRadius: "6px", border: "1px solid #ccc", fontSize: "1rem" }}
+        />
+        <input n
+          name="phone" 
+          type="tel" 
+          placeholder="Phone Number" 
+          onChange={handleInputChange} 
+          style={{ padding: "0.5rem", borderRadius: "6px", border: "1px solid #ccc", fontSize: "1rem" }}
+        />
+        <textarea 
+          name="message" 
+          placeholder="Optional message to seller" 
+          onChange={handleInputChange} 
+          style={{ padding: "0.5rem", borderRadius: "6px", border: "1px solid #ccc", fontSize: "1rem" }}
+        />
       </form>
 
       {/* Order Summary */}
       <h3>Cart Summary</h3>
-      <ul>
+      <ul style={{ listStyle: "none", paddingLeft: 0 }}>
         {cartItems.map(item => (
-          <li key={item.id}>{item.title} - ${item.price}</li>
+          <li key={item.id} style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "1rem",
+            padding: "0.75rem",
+            marginBottom: "0.75rem",
+            border: "1px solid #ddd",
+            borderRadius: "8px",
+            backgroundColor: "#fafafa"
+          }}>
+            {item.image && (
+              <img
+                src={`${process.env.REACT_APP_API_URL}/uploads/${item.image}`}
+                alt={item.title}
+                style={{
+                  width: "60px",
+                  height: "60px",
+                  objectFit: "contain",
+                  borderRadius: "6px",
+                  border: "1px solid #ccc"
+                }}
+              />
+            )}
+            <div>
+              <div style={{ fontWeight: "600" }}>{item.title}</div>
+              <div style={{ fontSize: "0.9rem", color: "#555" }}>${item.price}</div>
+            </div>
+          </li>
         ))}
       </ul>
 
-      <p><strong>Total:</strong> ${total.toFixed(2)}</p>
+
+
+      <p style={{ fontSize: "1.2rem", fontWeight: "600" }}>
+        Total: ${total.toFixed(2)}
+      </p>
+
 
       {/* Action buttons for checkout and navigation */}
-      <div style={{ display: "flex", gap: "1rem", marginTop: "1rem" }}>
-        <button onClick={handleConfirmCheckout}>Confirm Purchase</button>
-        <button onClick={handleBackToHome}>Back to Home</button>
+      <div style={{ display: "flex", gap: "1rem", marginTop: "1.5rem" }}>
+        <button
+          onClick={handleConfirmCheckout}
+          style={{
+            backgroundColor: "#28a745",
+            color: "white",
+            padding: "0.75rem 1.25rem",
+            borderRadius: "6px",
+            border: "none",
+            fontWeight: "600",
+            cursor: "pointer"
+          }}
+        >
+          Confirm Purchase
+        </button>
+
+        <button
+          onClick={handleBackToHome}
+          style={{
+            backgroundColor: "#6c757d",
+            color: "white",
+            padding: "0.75rem 1.25rem",
+            borderRadius: "6px",
+            border: "none",
+            fontWeight: "600",
+            cursor: "pointer"
+          }}
+        >
+          Back to Home
+        </button>
       </div>
+
     </div>
   );
 }

@@ -8,7 +8,7 @@ import CheckoutPage from './Pages/CheckoutPage';
 import SellerRequests from './Pages/SellerRequests';
 import BuyerRequests from './Pages/BuyerRequests';
 import BuyerOrderHistory from './Pages/BuyerOrderHistory';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 function AppWrapper() {
   const location = useLocation();
@@ -36,6 +36,20 @@ function AppWrapper() {
     setToken("");
     setUsername("");
   };
+
+  // Restore state from localStorage on mount
+  useEffect(() => {
+    const storedToken = localStorage.getItem("token");
+    const storedUsername = localStorage.getItem("username");
+    const storedRole = localStorage.getItem("role");
+
+    if (storedToken && storedUsername && storedRole) {
+      setToken(storedToken);
+      setUsername(storedUsername);
+      setUserRole(storedRole);
+    }
+  }, []);
+
 
   const isHomePage = location.pathname === "/";
   const isCheckoutPage = location.pathname === "/checkout";

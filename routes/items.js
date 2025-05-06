@@ -38,7 +38,7 @@ router.post("/", verifyToken, upload.single("image"), async (req, res) => {
 // Fetch all items
 router.get("/", async (req, res) => {
   console.log("Query parameters received:", req.query);
-  const { category, search } = req.query;
+  const { category, search, size, color, dimensions } = req.query;
 
   try {
     let queryText = "SELECT * FROM items";
@@ -54,21 +54,33 @@ router.get("/", async (req, res) => {
       const searchTerms = search.split(',').map(term => term.trim()).filter(Boolean);
       if (searchTerms.length > 0) {
         const searchConditions = [];
-
+    
         searchTerms.forEach(term => {
           const paramIndex = queryParams.length + 1;
           searchConditions.push(`(
             LOWER(title) LIKE $${paramIndex} OR 
-            LOWER(description) LIKE $${paramIndex} OR 
-            LOWER(COALESCE(size, '')) LIKE $${paramIndex} OR 
-            LOWER(COALESCE(color, '')) LIKE $${paramIndex} OR 
-            LOWER(COALESCE(dimensions, '')) LIKE $${paramIndex}
+            LOWER(description) LIKE $${paramIndex}
           )`);
           queryParams.push(`%${term.toLowerCase()}%`);
         });
         conditions.push(`(${searchConditions.join(' OR ')})`);
       }
     }
+    
+    // Exact matches for filters
+    if (size) {
+      queryParams.push(size.toLowerCase());
+      conditions.push(`LOWER(size) = $${queryParams.length}`);
+    }
+    if (color) {
+      queryParams.push(color.toLowerCase());
+      conditions.push(`LOWER(color) = $${queryParams.length}`);
+    }
+    if (dimensions) {
+      queryParams.push(dimensions.toLowerCase());
+      conditions.push(`LOWER(dimensions) = $${queryParams.length}`);
+    }
+    
 
     if (conditions.length > 0) {
       queryText += " WHERE " + conditions.join(" AND ");

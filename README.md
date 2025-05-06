@@ -1,5 +1,8 @@
 # SSW322-Milestone3-Group_2
 
+## Demo Recording
+https://stevens.zoom.us/rec/share/844a6MPUdjNsXTD297qeDZNlJNd4DeluBpXxmwSlPZ7k9kSSa6tk51wt4786lEuo.84rjMBOpdwHJ9DV4
+
 ## Project Description
 
 Exchange4Students enables students to:

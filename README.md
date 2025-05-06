@@ -7,25 +7,28 @@ Exchange4Students enables students to:
 - List items they want to sell and edit/delete listings
 - Browse items posted by other students
 - View item details
-- Add items to cart (TO BE IMPLEMENTED)
+- Add items to cart
+- Proceed through a checkout flow for virtual transactions
+- Cancel Pending orders
 - Message sellers and arrange pickup or delivery (TO BE IMPLEMENTED)
-- Proceed through a checkout flow for virtual transactions (TO BE IMPLEMENTED)
 
 | Team Member      | Responsibilities |
 |------------------|------------------|
-| Edmund Yuen      | Backend architecture, Seller backend setup, HTTPS setup, user authentication (JWT), PostgreSQL integration |
-| Jacob Gelman     | Update use case diagrams
-| James Grant      | Frontend setup, .jsx Page Routing, Buyer Page Integration & Database connection, Implemented Keyword Search functionality, Implemented "Browse by" functionality, UI style updates
-| Justin Phan      | Displaying items on buyer page
+| Edmund Yuen      | Backend architecture, Seller backend setup, HTTPS setup, user authentication (JWT), PostgreSQL integration, Implemented adding to cart and order placing functionality, Sellers receiving buy requests/Buyers getting request updates from sellers, Updated UI consistency across browsing items, checkout, and cart and Added conditional inputs for items |
+| Jacob Gelman     | Update use case diagram, activity diagram, and documentation
+| James Grant      | Frontend setup, .jsx Page Routing, Buyer Page Integration & Database connection, Implemented Keyword Search functionality, Implemented "Browse by" functionality, UI style updates, Implemented "Cancel Order" and "Clear Notification" functionality, Added "My Orders" page,
+| Justin Phan      | Displaying items on buyer page, Class Diagram updates, Implemented function for sellers to mark items as “on hold,” “sold,” or “available”, Improved checkout and register/login page form validation, Added option to unhide passwords,
 
 ## Functions Implemented
 - Users can log in to the system
 - A user can register an account for the first time
 - A seller can create a post to sell an item, which could be of any type, with the respective information of the item type collected
-- A buyer can browse previously posted items and select an item to view details
+- A buyer can browse previously posted items
 - A seller can edit or delete any of their posted items
 - Buyers can browse items by category, keywords, dimensions, size, and color
 - Sellers can mark items as "on hold,” “sold,” or “available”
+- Buyers can view their accepted order history
+- Buyers or Sellers can clear request notifications
 
 ## Technologies Used
 
@@ -57,9 +60,9 @@ This backend server provides RESTful API endpoints for basic functionality such 
 ## Team Responsibilities
 
 - **Edmund** – Set up backend architecture, implemented HTTPS server, User registration logic with PostgreSQL, JWT-based login flow, and environment configuration, started troubleshooting Global Access, Post Item Functionality, Edit/Delete Item Functionality
-- **James** - Set up frontend web display with seperate pages, components, and assets integrated through Routing, Integrated the initial Buyer page and connected item display through PostgreSQL database, Keyword Search function, Browse by size, color, and dimensions, Updated UI for Login page and post-Login
-- **Justin** - Displaying items on buyer page
-- **Jacob** - Update use case diagrams
+- **James** - Set up frontend web display with seperate pages, components, and assets integrated through Routing, Integrated the initial Buyer page and connected item display through PostgreSQL database, Keyword Search function, Browse by size, color, and dimensions, Updated UI for Login page and post-Login, Implemented "Cancel Order" and "Clear Notification" functionality, Added "My Orders" page,
+- **Justin** - Displaying items on buyer page, Class Diagram updates, Implemented function for sellers to mark items as “on hold,” “sold,” or “available”, Improved checkout and register/login page form validation, Added option to unhide passwords,
+- **Jacob** - Update use case diagram, activity diagram, and documentation
 
 ## Features Implemented
 

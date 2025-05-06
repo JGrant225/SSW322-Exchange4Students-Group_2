@@ -6,6 +6,7 @@ export default function BuyerRequests({ username, token }) {
   const [requests, setRequests] = useState([]);
   const [isOpen, setIsOpen] = useState(false);
   const [deleteStatus, setDeleteStatus] = useState({ message: "", error: false });
+  const [hiddenRequestIds, setHiddenRequestIds] = useState([]);
   const location = useLocation();
 
   useEffect(() => {
@@ -66,31 +67,12 @@ export default function BuyerRequests({ username, token }) {
     }
   };
 
-  const handleClearRequest = async (requestId) => {
+  const handleClearRequest = (requestId) => {
     if (!window.confirm("Are you sure you want to clear this notification?")) return;
   
-    try {
-      const response = await axios.put(
-        `${process.env.REACT_APP_API_URL}/buyrequests/clear/${requestId}`,
-        {},
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+    setHiddenRequestIds(prev => [...prev, requestId]);
+  };
   
-      // Remove from view
-      setRequests(requests.filter((req) => req.id !== requestId));
-  
-      setDeleteStatus({ message: "Notification cleared.", error: false });
-      setTimeout(() => setDeleteStatus({ message: "", error: false }), 3000);
-    } catch (err) {
-      console.error("[BuyerRequests] Clear Error:", err.response?.data || err.message);
-  
-      setDeleteStatus({
-        message: err.response?.data?.message || "Error clearing notification",
-        error: true,
-      });
-      setTimeout(() => setDeleteStatus({ message: "", error: false }), 5000);
-    }
-  };  
 
   if (location.pathname === "/checkout") return null;
 
@@ -148,7 +130,7 @@ export default function BuyerRequests({ username, token }) {
           {requests.length === 0 ? (
             <p>You haven't made any requests.</p>
           ) : (
-            requests.map((req) => (
+            requests.filter(req => !hiddenRequestIds.includes(req.id)).map((req) => (
               <div
                 key={req.id}
                 style={{

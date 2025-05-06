@@ -58,7 +58,7 @@ This backend server provides RESTful API endpoints for basic functionality such 
 
 - **Edmund** – Set up backend architecture, implemented HTTPS server, User registration logic with PostgreSQL, JWT-based login flow, and environment configuration, started troubleshooting Global Access, Post Item Functionality, Edit/Delete Item Functionality
 - **James** - Set up frontend web display with seperate pages, components, and assets integrated through Routing, Integrated the initial Buyer page and connected item display through PostgreSQL database, Keyword Search function, Browse by size, color, and dimensions, Updated UI for Login page and post-Login
-- **Justin** - Displaying items on buyer page, improving form validation for log in, register, and checkout, and adding show password function when registering and logging in
+- **Justin** - Displaying items on buyer page
 - **Jacob** - Update use case diagrams
 
 ## Features Implemented
@@ -161,5 +161,7 @@ This backend server provides RESTful API endpoints for basic functionality such 
       contact_phone TEXT NOT NULL,
       message TEXT,
       request_status VARCHAR(20) DEFAULT 'Pending' CHECK (request_status IN ('Pending', 'Accepted', 'Rejected')),
-      requested_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      requested_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      cleared_by_buyer BOOLEAN DEFAULT FALSE,
+      cleared_by_seller BOOLEAN DEFAULT FALSE,
     );

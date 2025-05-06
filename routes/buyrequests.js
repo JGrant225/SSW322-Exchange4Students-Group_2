@@ -34,7 +34,6 @@ router.post("/", verifyToken, async (req, res) => {
 // Get all buy requests for the logged-in seller
 router.get("/seller", verifyToken, async (req, res) => {
   const seller = req.user.username;
-  console.log("[GET] Logged-in seller:", seller);
 
   try {
     const result = await pool.query(
@@ -46,6 +45,7 @@ router.get("/seller", verifyToken, async (req, res) => {
        FROM buy_requests br
        JOIN items i ON br.item_id = i.id
        WHERE LOWER(i.seller_username) = LOWER($1)
+         AND (br.cleared_by_seller IS FALSE OR br.cleared_by_seller IS NULL)
        ORDER BY br.requested_at DESC`,
       [seller]
     );
@@ -70,7 +70,7 @@ router.get("/buyer", verifyToken, async (req, res) => {
          i.title AS item_title, i.image AS item_image, i.itemstatus
        FROM buy_requests br
        JOIN items i ON br.item_id = i.id
-       WHERE br.buyer_username = $1
+       WHERE br.buyer_username = $1 AND (br.cleared_by_buyer IS FALSE OR br.cleared_by_buyer IS NULL)
        ORDER BY br.requested_at DESC`,
       [buyer]
     );
@@ -82,6 +82,52 @@ router.get("/buyer", verifyToken, async (req, res) => {
   }
 });
 
+// Delete a buy request
+router.delete("/:id", verifyToken, async (req, res) => {
+  const buyer = req.user.username;
+  const requestId = req.params.id;
+  
+  console.log(`[DELETE] Buyer: ${buyer} attempting to delete request ID: ${requestId}`);
+  
+  try {
+    // First check if this request belongs to this buyer
+    const checkQuery = await pool.query(
+      `SELECT * FROM buy_requests WHERE id = $1 AND buyer_username = $2`,
+      [requestId, buyer]
+    );
+    
+    if (checkQuery.rows.length === 0) {
+      console.warn(`[DELETE] Request ${requestId} not found or doesn't belong to ${buyer}`);
+      return res.status(404).json({ 
+        message: "Buy request not found or you don't have permission to delete it." 
+      });
+    }
+    
+    // Only allow deletion of requests that are in Pending status
+    if (checkQuery.rows[0].request_status !== 'Pending') {
+      console.warn(`[DELETE] Cannot delete request ${requestId} with status ${checkQuery.rows[0].request_status}`);
+      return res.status(400).json({
+        message: `Cannot delete requests with '${checkQuery.rows[0].request_status}' status. Only 'Pending' requests can be deleted.`
+      });
+    }
+    
+    // Delete the request
+    const deleteResult = await pool.query(
+      `DELETE FROM buy_requests WHERE id = $1 RETURNING *`,
+      [requestId]
+    );
+    
+    console.log(`[DELETE] Successfully deleted request ${requestId}`);
+    res.json({ 
+      message: "Buy request successfully deleted",
+      deletedRequest: deleteResult.rows[0]
+    });
+    
+  } catch (err) {
+    console.error("[DELETE] Error deleting buy request:", err);
+    res.status(500).json({ message: "Failed to delete buy request", error: err.message });
+  }
+});
 
 // Accept a buy request and reject others
 router.put("/:id/accept", verifyToken, async (req, res) => {
@@ -160,6 +206,70 @@ router.put("/:id/status", verifyToken, async (req, res) => {
   } catch (err) {
     console.error("[STATUS] Error updating request status:", err);
     res.status(500).json({ message: "Failed to update request status" });
+  }
+});
+
+// Route to clear a buy request
+router.put('/clear/:id', verifyToken, async (req, res) => {
+  const requestId = req.params.id;
+  const buyerUsername = req.user.username;
+
+  try {
+    const result = await pool.query(
+      `UPDATE buy_requests
+       SET cleared_by_buyer = TRUE
+       WHERE id = $1 AND buyer_username = $2
+       RETURNING *;`,
+      [requestId, buyerUsername]
+    );
+
+    if (result.rowCount === 0) {
+      return res.status(404).json({ message: "Request not found or unauthorized" });
+    }
+
+    res.json({ message: 'Buy request cleared.' });
+  } catch (err) {
+    console.error("Clear error:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
+// Route to clear a buy request for seller
+router.put('/clear-seller/:id', verifyToken, async (req, res) => {
+  const requestId = req.params.id;
+  const sellerUsername = req.user.username;
+
+  try {
+    // First verify this request is for an item owned by this seller
+    const checkQuery = await pool.query(
+      `SELECT br.id
+       FROM buy_requests br
+       JOIN items i ON br.item_id = i.id
+       WHERE br.id = $1 AND LOWER(i.seller_username) = LOWER($2)`,
+      [requestId, sellerUsername]
+    );
+
+    if (checkQuery.rowCount === 0) {
+      return res.status(404).json({ message: "Request not found or unauthorized" });
+    }
+
+    // Update the request to be cleared by seller
+    const result = await pool.query(
+      `UPDATE buy_requests
+       SET cleared_by_seller = TRUE
+       WHERE id = $1
+       RETURNING *;`,
+      [requestId]
+    );
+
+    if (result.rowCount === 0) {
+      return res.status(404).json({ message: "Request not found" });
+    }
+
+    res.json({ message: 'Buy request cleared.' });
+  } catch (err) {
+    console.error("[CLEAR-SELLER] Error:", err);
+    res.status(500).json({ message: "Server error" });
   }
 });
 

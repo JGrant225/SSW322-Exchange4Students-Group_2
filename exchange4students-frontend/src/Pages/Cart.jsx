@@ -106,15 +106,69 @@ export default function Cart({ username, token, refreshTrigger }) {
           ) : (
             <>
               {cartItems.map((item) => (
-                <div key={item.id} style={{ marginBottom: "1rem" }}>
-                  <strong>{item.title}</strong>
-                  <p>Price: ${item.price}</p>
-                  <button onClick={() => handleRemove(item.id)}>Remove</button>
+                <div key={item.id} style={{
+                  display: "flex",
+                  alignItems: "center",
+                  border: "1px solid #ddd",
+                  borderRadius: "8px",
+                  padding: "0.5rem",
+                  marginBottom: "0.75rem",
+                  boxShadow: "0 2px 5px rgba(0,0,0,0.05)"
+                }}>
+                  {item.image && (
+                    <img
+                      src={`${process.env.REACT_APP_API_URL}/uploads/${item.image}`}
+                      alt={item.title}
+                      style={{
+                        width: "50px",
+                        height: "50px",
+                        borderRadius: "4px",
+                        objectFit: "contain",
+                        marginRight: "0.75rem",
+                        
+                      }}
+                    />
+                  )}
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontWeight: "600", fontSize: "0.95rem" }}>{item.title}</div>
+                    <div style={{ fontSize: "0.85rem", color: "#555" }}>Price: ${item.price}</div>
+                    <button
+                      onClick={() => handleRemove(item.id)}
+                      style={{
+                        marginTop: "0.25rem",
+                        backgroundColor: "#dc3545",
+                        color: "white",
+                        border: "none",
+                        borderRadius: "4px",
+                        padding: "0.3rem 0.6rem",
+                        fontSize: "0.75rem",
+                        cursor: "pointer"
+                      }}
+                    >
+                      Remove
+                    </button>
+                  </div>
                 </div>
               ))}
+
               <hr />
               <p><strong>Total:</strong> ${total.toFixed(2)}</p>
-              <button onClick={handleCheckoutRedirect}>Checkout</button>
+              <button
+                onClick={handleCheckoutRedirect}
+                style={{
+                  backgroundColor: "#28a745",
+                  color: "white",
+                  border: "none",
+                  borderRadius: "6px",
+                  padding: "0.5rem 1rem",
+                  width: "100%",
+                  marginTop: "0.75rem",
+                  fontWeight: "600",
+                  cursor: "pointer"
+                }}
+              >
+                Proceed to Checkout
+              </button>
             </>
           )}
         </div>

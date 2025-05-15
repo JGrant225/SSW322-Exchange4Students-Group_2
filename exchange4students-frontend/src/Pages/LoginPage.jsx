@@ -152,27 +152,74 @@ function OrdersAndRequestsView({ username, token}) {
               <strong>{order.item_title}</strong>
               <p>Status: {order.itemstatus}</p>
               <p>Requested: {new Date(order.requested_at).toLocaleString()}</p>
+              <button
+                onClick={() => handleDeleteBuyerRequest(order.id)}
+                style={{
+                  marginTop: "0.25rem",
+                  backgroundColor: "#dc3545",
+                  color: "white",
+                  border: "none",
+                  borderRadius: "4px",
+                  padding: "0.4rem 0.8rem",
+                  fontSize: "0.85rem",
+                  cursor: "pointer"
+                }}
+              >
+                Cancel Order
+              </button>
             </div>
           ))}
         </section>
 
         <section>
           <h3>My Requests</h3>
-          {buyerRequests.length === 0 ? <p>No requests made.</p> : buyerRequests
-            .filter(r => !clearedBuyerIds.includes(r.id))
-            .map(req => (
-              <div key={req.id} style={cardStyle}>
-                <strong>{req.item_title}</strong>
-                <p>Status: {req.request_status}</p>
-                <p>Item Status: {req.itemstatus}</p>
-                <p>Requested: {new Date(req.requested_at).toLocaleString()}</p>
-                {req.request_status === "Pending" ? (
-                  <button onClick={() => handleDeleteBuyerRequest(req.id)}>Cancel</button>
-                ) : (
-                  <button onClick={() => handleClearBuyerRequest(req.id)}>Clear</button>
-                )}
-              </div>
-            ))}
+          {buyerRequests.filter(r => !clearedBuyerIds.includes(r.id)).length === 0 ? (
+            <p>No requests made.</p>
+          ) : (
+            buyerRequests
+              .filter(r => !clearedBuyerIds.includes(r.id))
+              .map(req => (
+                <div key={req.id} style={cardStyle}>
+                  <strong>{req.item_title}</strong>
+                  <p>Status: {req.request_status}</p>
+                  <p>Item Status: {req.itemstatus}</p>
+                  <p>Requested: {new Date(req.requested_at).toLocaleString()}</p>
+                  {req.request_status === "Pending" ? (
+                    <button
+                      onClick={() => handleDeleteBuyerRequest(req.id)}
+                      style={{
+                        marginTop: "0.25rem",
+                        backgroundColor: "#dc3545",
+                        color: "white",
+                        border: "none",
+                        borderRadius: "4px",
+                        padding: "0.4rem 0.8rem",
+                        fontSize: "0.85rem",
+                        cursor: "pointer"
+                      }}
+                    >
+                      Cancel
+                    </button>
+                  ) : (
+                    <button
+                      onClick={() => handleClearBuyerRequest(req.id)}
+                      style={{
+                        marginTop: "0.25rem",
+                        backgroundColor: "#6c757d",
+                        color: "white",
+                        border: "none",
+                        borderRadius: "4px",
+                        padding: "0.4rem 0.8rem",
+                        fontSize: "0.85rem",
+                        cursor: "pointer"
+                      }}
+                    >
+                      Clear
+                    </button>
+                  )}
+                </div>
+              ))
+          )}
         </section>
       </>
 
@@ -188,11 +235,51 @@ function OrdersAndRequestsView({ username, token}) {
             <div style={{ marginTop: "0.5rem" }}>
               {req.request_status === "Pending" ? (
                 <>
-                  <button onClick={() => handleAcceptSellerRequest(req.id)}>Accept</button>{" "}
-                  <button onClick={() => handleRejectSellerRequest(req.id)}>Deny</button>
+                  <button
+                    onClick={() => handleAcceptSellerRequest(req.id)}
+                    style={{
+                      backgroundColor: "#28a745",
+                      color: "white",
+                      border: "none",
+                      borderRadius: "4px",
+                      padding: "0.4rem 0.8rem",
+                      fontSize: "0.85rem",
+                      cursor: "pointer",
+                      marginRight: "0.5rem"
+                    }}
+                  >
+                    Accept
+                  </button>
+                  <button
+                    onClick={() => handleRejectSellerRequest(req.id)}
+                    style={{
+                      backgroundColor: "#dc3545",
+                      color: "white",
+                      border: "none",
+                      borderRadius: "4px",
+                      padding: "0.4rem 0.8rem",
+                      fontSize: "0.85rem",
+                      cursor: "pointer"
+                    }}
+                  >
+                    Deny
+                  </button>
                 </>
               ) : (
-                <button onClick={() => handleClearSellerRequest(req.id)}>Clear</button>
+                <button
+                  onClick={() => handleClearSellerRequest(req.id)}
+                  style={{
+                    backgroundColor: "#6c757d",
+                    color: "white",
+                    border: "none",
+                    borderRadius: "4px",
+                    padding: "0.4rem 0.8rem",
+                    fontSize: "0.85rem",
+                    cursor: "pointer"
+                  }}
+                >
+                  Clear
+                </button>
               )}
             </div>
           </div>
@@ -331,6 +418,9 @@ export function LoginPage({ onCartUpdate, onRoleChange, onLogout }) {
       marginLeft: showSidebar ? "200px" : "0",
       transition: "margin-left 0.3s ease-in-out"
     }}>
+      <div style={{ textAlign: "center", marginBottom: "1rem" }}>
+        <img src="/logo.png" alt="Exchange4Students Logo" style={{ height: "100px" }} />
+      </div>
       <h1 style={{ textAlign: "center" }}>Welcome to Exchange4Students!</h1>
       <p style={{ textAlign: "center" }}>Logged in as: <strong>{username}</strong></p>
 

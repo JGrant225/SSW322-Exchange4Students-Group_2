@@ -32,13 +32,16 @@ export default function Home(){
     }
   };
 
-  return (
+    return (
     <div style={{ padding: "2rem" }}>
-      <h1
-        style={{
-          textAlign: "center",
-        }}
-      >Welcome to Exchange4Students!</h1>
+      {/* Logo */}
+      <div style={{ textAlign: "center", marginBottom: "1rem" }}>
+        <img src="/Logo.png" alt="Exchange4Students Logo" style={{ height: "100px" }} />
+      </div>
+
+      <h1 style={{ textAlign: "center" }}>
+        Welcome to Exchange4Students!
+      </h1>
 
       {/* If logged in, show logout info */}
       {username && (

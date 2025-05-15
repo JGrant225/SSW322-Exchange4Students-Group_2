@@ -59,12 +59,17 @@ export default function Home(){
     
     // Add user message to chat
     const userMessage = { content: inputMessage, role: "user" };
-    const newMessages = [...messages, userMessage];
-    setMessages(newMessages);
+    const chatMessages = [...messages, userMessage];
+    setMessages(chatMessages);
     setInputMessage("");
     setIsLoading(true);
     
     try {
+      const systemPrompt = {
+        role: "system",
+        content: "You are an assistant that creates high-quality, engaging product listing descriptions for marketplace items. Write concise, attractive descriptions using the provided details. Before generating the description, make sure to receive all important details from the user first. Do NOT give the user the description unless they provide these details, it is crucial. "
+      };
+
       // Replace with your actual API endpoint and key handling
       const response = await fetch("https://api.openai.com/v1/chat/completions", {
         method: "POST",
@@ -74,10 +79,7 @@ export default function Home(){
         },
         body: JSON.stringify({
           model: "gpt-3.5-turbo",
-          messages: newMessages.map(msg => ({
-            role: msg.role,
-            content: msg.content
-          })),
+          messages: [systemPrompt, ...chatMessages],
           max_tokens: 150
         })
       });

@@ -5,8 +5,11 @@ import { useLocation } from "react-router-dom";
 export default function BuyerRequests({ username, token }) {
   const [requests, setRequests] = useState([]);
   const [isOpen, setIsOpen] = useState(false);
+  const [clearedRequestIds, setClearedRequestIds] = useState(() => {
+    const stored = localStorage.getItem("clearedRequestIds");
+    return stored ? JSON.parse(stored) : [];
+  });
   const [deleteStatus, setDeleteStatus] = useState({ message: "", error: false });
-  const [hiddenRequestIds, setHiddenRequestIds] = useState([]);
   const location = useLocation();
 
   useEffect(() => {
@@ -68,11 +71,16 @@ export default function BuyerRequests({ username, token }) {
   };
 
   const handleClearRequest = (requestId) => {
-    if (!window.confirm("Are you sure you want to clear this notification?")) return;
-  
-    setHiddenRequestIds(prev => [...prev, requestId]);
-  };
-  
+  if (!window.confirm("Are you sure you want to clear this notification?")) return;
+
+  const updated = [...clearedRequestIds, requestId];
+  setClearedRequestIds(updated);
+  localStorage.setItem("clearedRequestIds", JSON.stringify(updated));
+
+  setDeleteStatus({ message: "Notification cleared.", error: false });
+  setTimeout(() => setDeleteStatus({ message: "", error: false }), 3000);
+};
+
 
   if (location.pathname === "/checkout") return null;
 
@@ -92,7 +100,7 @@ export default function BuyerRequests({ username, token }) {
         }}
         onClick={() => setIsOpen(!isOpen)}
       >
-        My Requests ({requests.length})
+        My Requests ({requests.filter(req => !clearedRequestIds.includes(req.id)).length})
       </div>
 
       {isOpen && (
@@ -130,7 +138,7 @@ export default function BuyerRequests({ username, token }) {
           {requests.length === 0 ? (
             <p>You haven't made any requests.</p>
           ) : (
-            requests.filter(req => !hiddenRequestIds.includes(req.id)).map((req) => (
+            requests.filter(req => !clearedRequestIds.includes(req.id)).map((req) => (
               <div
                 key={req.id}
                 style={{

@@ -17,27 +17,10 @@ function AppWrapper() {
   const [userRole, setUserRole] = useState("");
   const [cartUpdateTrigger, setCartUpdateTrigger] = useState(0);
 
-  const handleCartUpdate = () => {
-    setCartUpdateTrigger(prev => prev + 1);
-  };
+  const handleCartUpdate = () => setCartUpdateTrigger(prev => prev + 1);
+  const isHomePage = location.pathname === "/";
+  const isCheckoutPage = location.pathname === "/checkout";
 
-  const handleRoleChange = (role) => {
-    setUserRole(role);
-    setToken(localStorage.getItem("token") || "");
-    setUsername(localStorage.getItem("username") || "");
-  };
-
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("username");
-    localStorage.removeItem("role");
-
-    setUserRole("");
-    setToken("");
-    setUsername("");
-  };
-
-  // Restore state from localStorage on mount
   useEffect(() => {
     const storedToken = localStorage.getItem("token");
     const storedUsername = localStorage.getItem("username");
@@ -50,24 +33,23 @@ function AppWrapper() {
     }
   }, []);
 
+  const handleRoleChange = (role) => {
+    setUserRole(role);
+    setToken(localStorage.getItem("token") || "");
+    setUsername(localStorage.getItem("username") || "");
+  };
 
-  const isHomePage = location.pathname === "/";
-  const isCheckoutPage = location.pathname === "/checkout";
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("username");
+    localStorage.removeItem("role");
+    setUserRole(""); setToken(""); setUsername("");
+  };
 
   return (
     <>
-      {/* Buyer features */}
       {userRole === "buyer" && token && !isHomePage && (
-        <>
-          <Cart username={username} token={token} refreshTrigger={cartUpdateTrigger} />
-          <BuyerRequests username={username} token={token} />
-          {!isCheckoutPage && <BuyerOrderHistory username={username} token={token} />}
-        </>
-      )}
-
-      {/* Seller features */}
-      {userRole === "seller" && token && !isHomePage && (
-        <SellerRequests username={username} token={token} />
+        <Cart username={username} token={token} refreshTrigger={cartUpdateTrigger} />
       )}
 
       <Routes>

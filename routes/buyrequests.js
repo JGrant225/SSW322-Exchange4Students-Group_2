@@ -103,13 +103,17 @@ router.delete("/:id", verifyToken, async (req, res) => {
       });
     }
     
-    // Only allow deletion of requests that are in Pending status
-    if (checkQuery.rows[0].request_status !== 'Pending') {
-      console.warn(`[DELETE] Cannot delete request ${requestId} with status ${checkQuery.rows[0].request_status}`);
-      return res.status(400).json({
-        message: `Cannot delete requests with '${checkQuery.rows[0].request_status}' status. Only 'Pending' requests can be deleted.`
-      });
-    }
+    // Allow cancellation even if accepted — mark as "Cancelled"
+    const cancelResult = await pool.query(
+      `UPDATE buy_requests SET request_status = 'Cancelled' WHERE id = $1 RETURNING *`,
+      [requestId]
+    );
+
+    console.log(`[DELETE] Soft-cancelled request ${requestId}`);
+    return res.json({ 
+      message: "Buy request cancelled successfully",
+      cancelledRequest: cancelResult.rows[0]
+    });
     
     // Delete the request
     const deleteResult = await pool.query(

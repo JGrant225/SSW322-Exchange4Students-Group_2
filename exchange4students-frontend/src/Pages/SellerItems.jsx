@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
+import AIAssistant from "../Components/AIAssistant";
 
 // SellerItems component allows the seller to view, edit, and delete their own items
 export default function SellerItems({ username, token, refreshTrigger }) {
@@ -22,7 +23,6 @@ export default function SellerItems({ username, token, refreshTrigger }) {
     color: "",
     itemstatus: ""
   });
-
 
   const inputStyle = {
     padding: "0.5rem",
@@ -543,6 +543,7 @@ export default function SellerItems({ username, token, refreshTrigger }) {
         }
       `}
     </style>
+      <AIAssistant currentTab="seller" />
   </div>
   );
 }

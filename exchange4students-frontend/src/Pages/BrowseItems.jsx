@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
 
 //Category icons to improve UI
@@ -21,6 +21,17 @@ export function BrowseItems({ onCartUpdate, username, token }) {
   const [colorFilter, setColorFilter] = useState('');
   const [dimensionsFilter, setDimensionsFilter] = useState('');
   const [debugInfo, setDebugInfo] = useState('');
+
+  // Chatbot states
+  const [messages, setMessages] = useState([
+    {
+      content: "Hello! I am the Exchange4Students AI assistant! How may I help you?",
+      role: "assistant"
+    }
+  ]);
+  const [inputMessage, setInputMessage] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const messagesEndRef = useRef(null);
 
   // Initial load of items
   useEffect(() => {
@@ -123,6 +134,67 @@ export function BrowseItems({ onCartUpdate, username, token }) {
     }
   };
 
+  // Scroll to bottom of chat whenever messages change
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  const sendMessage = async (e) => {
+    e.preventDefault();
+    
+    if (inputMessage.trim() === "") return;
+    
+    // Add user message to chat
+    const userMessage = { content: inputMessage, role: "user" };
+    const chatMessages = [...messages, userMessage];
+    setMessages(chatMessages);
+    setInputMessage("");
+    setIsLoading(true);
+    
+    try {
+
+      const systemPrompt = {
+        role: "system",
+        content: "You are an AI assistant that helps users navigate a marketplace app. Your role is to guide buyers through the app’s features and answer any questions they have. Assist users with actions such as applying search filters (including clothing sizes, color, and item dimensions), sending purchase requests through the checkout process, and viewing their orders or request history. Let users know that order and request details can be accessed from the menu button located in the top-left corner of the app and under the 'Orders and Requests' tab. This tab will show all past orders and requests without additional clicking. Always provide clear, friendly, and concise instructions that make it easy for users to take their next step."
+      };
+
+      // Replace with your actual API endpoint and key handling
+      const response = await fetch("https://api.openai.com/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${process.env.REACT_APP_OPENAI_API_KEY}`
+        },
+        body: JSON.stringify({
+          model: "gpt-3.5-turbo",
+          messages: [systemPrompt, ...chatMessages],
+          max_tokens: 150
+        })
+      });
+      
+      const data = await response.json();
+      
+      if (data.choices && data.choices[0]) {
+        setMessages(prev => [
+          ...prev,
+          { content: data.choices[0].message.content, role: "assistant" }
+        ]);
+      }
+    } catch (error) {
+      console.error("Error calling OpenAI API:", error);
+      setMessages(prev => [
+        ...prev,
+        { content: "Sorry, I encountered an error. Please try again later.", role: "assistant" }
+      ]);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   // Render search tags
   const renderSearchTags = () => {
     const allTags = [];
@@ -141,7 +213,7 @@ export function BrowseItems({ onCartUpdate, username, token }) {
     if (dimensionsFilter) allTags.push({ type: 'dimensions', value: dimensionsFilter });
     
     if (allTags.length === 0) return null;
-    
+
     return (
       <div style={{ marginBottom: "1rem", display: "flex", flexWrap: "wrap", gap: "0.5rem" }}>
         {allTags.map((tag, index) => (
@@ -432,6 +504,124 @@ export function BrowseItems({ onCartUpdate, username, token }) {
           }
         `}
       </style>
+      {/* Custom ChatGPT chatbot */}
+    <div>
+        <h2>Exchange4Students AI Assistant</h2>
+        <div 
+          style={{
+            width: "700px",
+            maxWidth: "100%",
+            height: "500px",
+            border: "1px solid #ccc",
+            borderRadius: "8px",
+            padding: "1rem",
+            marginBottom: "1rem",
+            overflow: "auto",
+            display: "flex",
+            flexDirection: "column"
+          }}
+        >
+          {messages.map((message, index) => (
+            <div
+              key={index}
+              style={{
+                alignSelf: message.role === "user" ? "flex-end" : "flex-start",
+                backgroundColor: message.role === "user" ? "#2b5876" : "#f0f0f0",
+                color: message.role === "user" ? "white" : "black",
+                padding: "0.75rem 1rem",
+                borderRadius: "1rem",
+                marginBottom: "0.5rem",
+                maxWidth: "80%",
+                wordBreak: "break-word"
+              }}
+            >
+              {message.content}
+            </div>
+          ))}
+          {isLoading && (
+            <div
+              style={{
+                alignSelf: "flex-start",
+                backgroundColor: "#f0f0f0",
+                color: "black",
+                padding: "0.75rem 1rem",
+                borderRadius: "1rem",
+                marginBottom: "0.5rem"
+              }}
+            >
+              <div className="typing-indicator">
+                <span></span>
+                <span></span>
+                <span></span>
+              </div>
+            </div>
+          )}
+          <div ref={messagesEndRef} />
+        </div>
+        
+        <form onSubmit={sendMessage} style={{ display: "flex", width: "700px", maxWidth: "100%" }}>
+          <input
+            type="text"
+            value={inputMessage}
+            onChange={(e) => setInputMessage(e.target.value)}
+            placeholder="Type your message here..."
+            style={{
+              flex: 1,
+              padding: "0.75rem",
+              borderRadius: "8px 0 0 8px",
+              border: "1px solid #ccc",
+              borderRight: "none"
+            }}
+          />
+          <button
+            type="submit"
+            disabled={isLoading}
+            style={{
+              padding: "0.75rem 1.5rem",
+              backgroundColor: "#2b5876",
+              color: "white",
+              border: "none",
+              borderRadius: "0 8px 8px 0",
+              cursor: isLoading ? "not-allowed" : "pointer"
+            }}
+          >
+            {isLoading ? "Sending..." : "Send"}
+          </button>
+        </form>
+        
+        <style jsx>{`
+          .typing-indicator {
+            display: flex;
+            padding: 4px;
+          }
+          
+          .typing-indicator span {
+            height: 10px;
+            width: 10px;
+            background-color: #666;
+            border-radius: 50%;
+            display: inline-block;
+            margin: 0 2px;
+            animation: bounce 1.4s infinite ease-in-out both;
+          }
+          
+          .typing-indicator span:nth-child(1) {
+            animation-delay: -0.32s;
+          }
+          
+          .typing-indicator span:nth-child(2) {
+            animation-delay: -0.16s;
+          }
+          
+          @keyframes bounce {
+            0%, 80%, 100% { 
+              transform: scale(0);
+            } 40% { 
+              transform: scale(1.0);
+            }
+          }
+        `}</style>
+      </div>
     </div>
   );
 }

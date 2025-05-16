@@ -1,8 +1,8 @@
 import React, { useState, useRef, useEffect } from "react";
 
-export default function AIAssistant() {
+export default function AIAssistant({ currentTab = "buyer" }) {
   const [messages, setMessages] = useState([
-    { content: "Hello! I'm your AI assistant. How can I help you today?", role: "assistant" }
+    { content: "Hello! I'm your AI assistant. How can I help you today? Need help posting an item or how to browse?", role: "assistant" }
   ]);
   const [inputMessage, setInputMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -30,8 +30,11 @@ export default function AIAssistant() {
     try {
       const systemPrompt = {
         role: "system",
-        content: "You are an assistant that creates high-quality, engaging product listing descriptions for marketplace items. Write concise, attractive descriptions using the provided details. Before generating the description, make sure to receive all important details from the user first. Do NOT give the user the description unless they provide these details, it is crucial."
-      };
+        content:
+            currentTab === "seller"
+            ? "You are an assistant that creates high-quality, engaging product listing descriptions for marketplace items. Write concise, attractive descriptions using the provided details. Before generating the description, make sure to receive all important details from the user first. Do NOT give the user the description unless they provide these details, it is crucial."
+            : "You are an AI assistant that helps users navigate a marketplace app. Your role is to guide buyers through the app’s features and answer any questions they have. Assist users with actions such as applying search filters (including clothing sizes, color, and item dimensions), sending purchase requests through the checkout process, and viewing their orders or request history. Let users know that order and request details can be accessed from the menu button (three horizontal lines) located in the top-left corner of the app and under the 'Orders and Requests' tab. This tab will show all past orders and requests without additional clicking. To send a buy request, users should click the 'Add to Cart' button and fill out the checkout form with their personal contact details (name, phone number, email). Always provide clear, friendly, and concise instructions that make it easy for users to take their next step."
+        };
 
       const res = await fetch("https://api.openai.com/v1/chat/completions", {
         method: "POST",

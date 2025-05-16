@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
+import AIAssistant from "../Components/AIAssistant";
 
 //Category icons to improve UI
 const categoryIcons = {
@@ -141,7 +142,7 @@ export function BrowseItems({ onCartUpdate, username, token }) {
     if (dimensionsFilter) allTags.push({ type: 'dimensions', value: dimensionsFilter });
     
     if (allTags.length === 0) return null;
-    
+
     return (
       <div style={{ marginBottom: "1rem", display: "flex", flexWrap: "wrap", gap: "0.5rem" }}>
         {allTags.map((tag, index) => (
@@ -432,6 +433,7 @@ export function BrowseItems({ onCartUpdate, username, token }) {
           }
         `}
       </style>
+      <AIAssistant currentTab="buyer" />
     </div>
   );
 }

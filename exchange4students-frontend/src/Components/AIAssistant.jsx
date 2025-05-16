@@ -6,7 +6,7 @@ export default function AIAssistant() {
   ]);
   const [inputMessage, setInputMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [isOpen, setIsOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(true);
   const messagesEndRef = useRef(null);
 
   useEffect(() => {
